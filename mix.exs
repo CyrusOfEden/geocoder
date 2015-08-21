@@ -3,8 +3,8 @@ defmodule Geocoder.Mixfile do
 
   def project do
     [app: :geocoder,
-     description: "A simple, efficient geocoder/reverse geocoder with a built-in cache."
-     version: "0.0.1",
+     description: "A simple, efficient geocoder/reverse geocoder with a built-in cache.",
+     version: "0.1.0",
      elixir: "~> 1.0",
      package: package,
      build_embedded: Mix.env == :prod,
@@ -13,7 +13,7 @@ defmodule Geocoder.Mixfile do
   end
 
   def package do
-    [licences: ["MIT"],
+    [licenses: ["MIT"],
      contributors: ["Kash Nouroozi"],
      links: %{"Github" => "https://githu.com/knrz/geocoder"}]
   end
@@ -26,6 +26,6 @@ defmodule Geocoder.Mixfile do
   defp deps do
     [{:httpoison, "~> 0.7"},
      {:poison, "~> 1.4"},
-     {:towel, "~> 0.0.1"}]
+     {:towel, "~> 0.2"}]
   end
 end
