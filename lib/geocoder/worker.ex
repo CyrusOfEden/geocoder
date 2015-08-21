@@ -27,41 +27,27 @@ defmodule Geocoder.Worker do
   end
 
   def handle_call({:geocode, address}, _from, opts) do
-    result = case opts[:store].geocode(address) do
-      {:ok, coords} ->
-        ok(coords)
-      {:error, _} ->
-        get_and_update(opts[:store], opts[:provider], :geocode, address)
-        |> fmap(fn coords ->
-          opts[:store].link(address, coords)
-          coords
-        end)
+    case opts[:store].geocode(address) do
+      {:just, coords} ->
+        {:reply, ok(coords), opts}
+      :nothing ->
+        {:reply, get_and_update(opts, :geocode, address), opts}
     end
-    {:reply, result, opts}
   end
 
   def handle_call({:reverse_geocode, latlon}, _from, opts) do
-    result = case opts[:store].reverse_geocode(latlon) do
-      {:ok, coords} ->
-        ok(coords)
-      {:error, _} ->
-        get_and_update(opts[:store], opts[:provider], :reverse_geocode, latlon)
-        |> fmap(fn coords ->
-          opts[:store].link(latlon, coords)
-          coords
-        end)
+    case opts[:store].reverse_geocode(latlon) do
+      {:just, coords} ->
+        {:reply, ok(coords), opts}
+      :nothing ->
+        {:reply, get_and_update(opts, :reverse_geocode, latlon), opts}
     end
-    {:reply, result, opts}
   end
 
   # Private API
-  defp get_and_update(store, provider, function, args) do
-    case apply(provider, function, List.wrap(args)) do
-      {:ok, coords} ->
-        store.update(coords)
-        ok(coords)
-      {:error, reason} ->
-        error(reason)
-    end
+  defp get_and_update([store: store, provider: provider], function, name) do
+    apply(provider, function, [name])
+    |> tap(&store.update/1)
+    |> tap(&store.link(name, &1))
   end
 end

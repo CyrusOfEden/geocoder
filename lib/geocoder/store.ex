@@ -36,79 +36,93 @@ defmodule Geocoder.Store do
   end
 
   def handle_call({:geocode, key}, _from, state = {links,store,_}) do
-    result = get_link(links, key) |> fmap(&Map.get(store, &1))
-    {:reply, result, state}
+    {:reply, fmap(get_link(links, key), &Map.get(store, &1)), state}
   end
 
   def handle_call({:reverse_geocode, latlon}, _from, state = {links,store,bounds}) do
-    result = case get_link(links, latlon) do
-      {:ok, key}  ->
-        get_value(store, key)
-      {:error, _} ->
-        find_cached_bound(bounds, latlon)
-        |> bind(&get_value(store, &1))
+    case get_link(links, latlon) do
+      {:just, key} ->
+        {:reply, get_value(store, key), state}
+      :nothing ->
+        {:reply, bind(find_cached_bound(bounds, latlon), &get_value(store, &1)), state}
     end
-    {:reply, result, state}
   end
 
   def handle_cast({:update, coords}, store) do
     {:noreply, update_store(store, coords)}
   end
 
-  def handle_cast({:link, from, to}, store) do
-    {:noreply, add_link(store, from, to)}
+  def handle_cast({:link, from, to}, store = {links,_,_}) do
+    links = put_link(links, from, encode_key(to.location))
+    {:noreply, put_elem(store, 0, links)}
   end
 
-  defp get_value(store, key) do
-    wrap(Map.get(store, key))
+  # Private API
+  def cached?(store, coords) do
+    Map.has_key?(store, encode_key(coords))
   end
 
-  defp get_link(links, key) do
-    wrap(links) |> fmap(&Map.get(&1, encode_key(key)))
+  def get_value(store, key) do
+    store |> Map.get(key) |> Maybe.wrap
   end
 
-  defp add_link({links, store, bounds}, from, to) do
-    links = Map.put(links, encode_key(from), encode_key(to))
-
-    {links, store, bounds}
+  def get_link(links, key) do
+    links |> Map.get(encode_key(key)) |> Maybe.wrap
   end
 
-  defp update_store({links, store, bounds}, coords) do
-    key = encode_key(coords)
+  def put_link(links, from, to) do
+    Map.put(links, encode_key(from), encode_key(to))
+  end
 
-    links = Map.put(links, key, key)
-    store = Map.put(store, key, coords)
-    unless is_nil(coords.bounds.top) or is_nil(coords.bounds.right) or
-           is_nil(coords.bounds.bottom) or is_nil(coords.bounds.left) do
+  def put_links(links, coords, key) do
+    List.foldl [coords, coords.location], links, &put_link(&2, &1, key)
+  end
+
+  def update_store({links,store,bounds}, coords) do
+    key = encode_key(coords.location)
+
+    if valid_bounds(coords.bounds) and not cached?(store, key) do
       bounds = [{key, coords.bounds}|bounds]
     end
+    links = put_links(links, coords, key)
+    store = Map.put(store, key, coords)
 
     {links, store, bounds}
   end
 
-  defp find_cached_bound(bounds, {lat,lon}) do
-    wrap(bounds)
-    |> fmap(&Enum.find(&1, fn {_,bounds} ->
-      lat <= bounds.top and lat >= bounds.bottom and
-      lon <= bounds.right and lon >= bounds.left
-    end))
+  def find_cached_bound(bounds, coords) do
+    bounds
+    |> Enum.find(&within_bounds(coords, elem(&1, 1)))
+    |> Maybe.wrap
     |> fmap(&elem(&1, 0))
   end
 
-  defp encode_key(string) when is_binary(string) do
+  def within_bounds({lat,lon}, %{top: top, right: right, bottom: bottom, left: left}) do
+    lat <= top and lat >= bottom and
+    lon <= right and lon >= left
+  end
+
+  def valid_bounds(%{top: top, right: right, bottom: bottom, left: left}) do
+    not (is_nil(top) or is_nil(right) or is_nil(bottom) or is_nil(left))
+  end
+
+  def encode_key(string) when is_binary(string) do
     string
     |> String.replace(~r/[^\w]/, "")
     |> String.downcase
   end
 
-  defp encode_key(%{location: %{city: city, state: state, country: country}}) do
+  def encode_key(%{lat: lat, lon: lon}) do
+    encode_key({lat,lon})
+  end
+  def encode_key({lat,lon}) do
+    round = &Float.round(&1, 3)
+    "#{round.(lat)},#{round.(lon)}"
+  end
+
+  def encode_key(%{city: city, state: state, country: country}) do
     [city, state, country]
     |> Enum.join("")
     |> encode_key
-  end
-
-  defp encode_key({lat,lon}) do
-    round = &Float.round(&1, 8)
-    "#{round.(lat)},#{round.(lon)}"
   end
 end
