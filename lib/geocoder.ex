@@ -3,7 +3,11 @@ defmodule Geocoder do
 
   def pool_name, do: :geocoder_workers
   def config do
-    [worker_module: Geocoder.Worker, name: {:local, pool_name}]
+    Application.get_env(:geocoder, :worker_pool_config)
+    |> Enum.into([
+      worker_module: Geocoder.Worker,
+      name: {:local, pool_name}
+    ])
   end
 
   def start(_type, _opts) do
