@@ -1,20 +1,24 @@
 defmodule Geocoder do
   use Application
 
-  @defaults [worker: [], store: nil]
-  def start(_type, opts) do
-    opts = Keyword.merge(@defaults, opts)
+  def pool_name, do: :geocoder_workers
+  def config do
+    [worker_module: Geocoder.Worker, name: {:local, pool_name}]
+  end
 
+  def start(_type, _opts) do
     import Supervisor.Spec
 
     children = [
-      worker(Geocoder.Worker, [opts[:worker]]),
-      worker(Geocoder.Store, [opts[:store]])
+      :poolboy.child_spec(pool_name, config, []),
+      worker(Geocoder.Store, [])
     ]
 
-    opts = [strategy: :one_for_one, name: Geocoder.Supervisor]
-    Supervisor.start_link(children, opts)
-  end
+    options = [
+      strategy: :one_for_one,
+      name: Geocoder.Supervisor
+    ]
 
-  defdelegate [call(q), geocode(address), reverse_geocode(latlon)], to: Geocoder.Worker
+    Supervisor.start_link(children, options)
+  end
 end

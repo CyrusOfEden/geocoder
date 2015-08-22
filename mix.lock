@@ -2,5 +2,6 @@
   "httpoison": {:hex, :httpoison, "0.7.2"},
   "idna": {:hex, :idna, "1.0.2"},
   "poison": {:hex, :poison, "1.4.0"},
+  "poolboy": {:hex, :poolboy, "1.5.1"},
   "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"},
   "towel": {:hex, :towel, "0.2.0"}}

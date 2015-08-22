@@ -4,7 +4,7 @@ defmodule Geocoder.Mixfile do
   def project do
     [app: :geocoder,
      description: "A simple, efficient geocoder/reverse geocoder with a built-in cache.",
-     version: "0.1.1",
+     version: "0.2.0",
      elixir: "~> 1.0",
      package: package,
      build_embedded: Mix.env == :prod,
@@ -19,13 +19,14 @@ defmodule Geocoder.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :httpoison],
+    [applications: [:logger, :poolboy, :httpoison],
      mod: {Geocoder, []}]
   end
 
   defp deps do
     [{:httpoison, "~> 0.7"},
      {:poison, "~> 1.4"},
-     {:towel, "~> 0.2"}]
+     {:towel, "~> 0.2"},
+     {:poolboy, "~> 1.5"}]
   end
 end

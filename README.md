@@ -13,7 +13,7 @@ Keep calm and add Geocoder to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
-  [{:geocoder, "~> 0.1"}]
+  [{:geocoder, "~> 0.2"}]
 end
 ```
 

@@ -2,52 +2,65 @@ defmodule Geocoder.Worker do
   use GenServer
   use Towel
 
-  @name :geocoder_worker
+  @defaults [
+    timeout: 5000,
+    stream_to: nil,
+  ]
 
   # Public API
-  def call(q) when is_binary(q), do: geocode(q)
-  def call(q = {_,_}), do: reverse_geocode(q)
+  def call(q, opts \\ [])
+  def call(q, opts) when is_binary(q), do: geocode(q, opts)
+  def call(q = {_,_}, opts), do: reverse_geocode(q, opts)
 
-  def geocode(address) do
-    GenServer.call(@name, {:geocode, address})
+  def geocode(address, opts \\ []) do
+    opts = Keyword.merge(@defaults, opts)
+    assign(:geocode, address, opts)
   end
 
-  def reverse_geocode(latlon) do
-    GenServer.call(@name, {:reverse_geocode, latlon})
+  def reverse_geocode(latlon, opts \\ []) do
+    opts = Keyword.merge(@defaults, opts)
+    assign(:reverse_geocode, latlon, opts)
+  end
+
+  defp assign(name, param, opts) do
+    function = case {opts[:stream_to], {name, param, opts}} do
+      {nil, message} -> &GenServer.call(&1, message)
+      {_,   message} -> &GenServer.cast(&1, message)
+    end
+
+    :poolboy.transaction Geocoder.pool_name, function, opts[:timeout]
   end
 
   # GenServer API
-  @defaults [
-    store: Geocoder.Store,
-    provider: Geocoder.Providers.GoogleMaps
-  ]
-  def start_link(opts) do
-    opts = Keyword.merge(@defaults, opts)
-    GenServer.start_link(__MODULE__, opts, name: @name)
+  def start_link(_) do
+    opts = [
+      store: Geocoder.Store,
+      provider: Geocoder.Providers.GoogleMaps
+    ]
+    GenServer.start_link(__MODULE__, opts)
   end
 
-  def handle_call({:geocode, address}, _from, opts) do
-    case opts[:store].geocode(address) do
+  def init(state) do
+    {:ok, state}
+  end
+
+  def handle_call({function, param, _req_options}, _from, opts) do
+    {:reply, run(function, param, opts), opts}
+  end
+
+  def handle_cast({function, param, req_options}, opts) do
+    send(req_options[:stream_to], run(function, param, opts))
+    {:noreply, opts}
+  end
+
+  defp run(function, param, [store: store, provider: provider]) do
+    case apply(store, function, [param]) do
       {:just, coords} ->
-        {:reply, ok(coords), opts}
+        ok(coords)
       :nothing ->
-        {:reply, get_and_update(opts, :geocode, address), opts}
+        apply(provider, function, [param])
+        |> tap(&store.update/1)
+        |> tap(&store.link(param, &1))
     end
-  end
-
-  def handle_call({:reverse_geocode, latlon}, _from, opts) do
-    case opts[:store].reverse_geocode(latlon) do
-      {:just, coords} ->
-        {:reply, ok(coords), opts}
-      :nothing ->
-        {:reply, get_and_update(opts, :reverse_geocode, latlon), opts}
-    end
-  end
-
-  # Private API
-  defp get_and_update([store: store, provider: provider], function, name) do
-    apply(provider, function, [name])
-    |> tap(&store.update/1)
-    |> tap(&store.link(name, &1))
   end
 end
