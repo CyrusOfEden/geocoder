@@ -51,6 +51,8 @@ defmodule Geocoder.Providers.GoogleMaps do
     map = &Map.get(&1, "long_name")
 
     case Enum.filter_map(components, filter, map) do
+      [country] ->
+        %Geocoder.Location{country: country}
       [city,country] ->
         %Geocoder.Location{city: city, country: country}
       [city,state,country] ->
