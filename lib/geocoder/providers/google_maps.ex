@@ -40,24 +40,27 @@ defmodule Geocoder.Providers.GoogleMaps do
       "southwest" => %{"lat" => south, "lng" => west}} = bounds
     %Geocoder.Bounds{top: north, right: east, bottom: south, left: west}
   end
+  defp geocode_bounds(_), do: %Geocoder.Bounds{}
 
   @components ["locality", "administrative_area_level_1", "country"]
+  @map %{
+    "locality" => :city,
+    "administrative_area_level_1" => :state,
+    "country" => :country
+  }
   defp geocode_location(%{"address_components" => components}) do
-    filter = fn component ->
-      types = Map.get(component, "types")
-      Enum.any?(types, &Enum.member?(@components, &1))
+    name = &Map.get(&1, "long_name")
+    type = fn component ->
+      component |> Map.get("types") |> Enum.find(&Enum.member?(@components, &1))
     end
 
-    map = &Map.get(&1, "long_name")
+    map = &({type.(&1), name.(&1)})
 
-    case Enum.filter_map(components, filter, map) do
-      [country] ->
-        %Geocoder.Location{country: country}
-      [city,country] ->
-        %Geocoder.Location{city: city, country: country}
-      [city,state,country] ->
-        %Geocoder.Location{city: city, state: state, country: country}
-    end
+    components
+    |> Enum.filter_map(type, map)
+    |> Enum.reduce(%Geocoder.Location{}, fn {type, name}, location ->
+      Map.put(location, Map.get(@map, type), name)
+    end)
   end
 
   defp request(path, params) do

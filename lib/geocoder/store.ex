@@ -58,27 +58,27 @@ defmodule Geocoder.Store do
   end
 
   # Private API
-  def cached?(store, coords) do
+  defp cached?(store, coords) do
     Map.has_key?(store, encode_key(coords))
   end
 
-  def get_value(store, key) do
+  defp get_value(store, key) do
     store |> Map.get(key) |> Maybe.wrap
   end
 
-  def get_link(links, key) do
+  defp get_link(links, key) do
     links |> Map.get(encode_key(key)) |> Maybe.wrap
   end
 
-  def put_link(links, from, to) do
+  defp put_link(links, from, to) do
     Map.put(links, encode_key(from), encode_key(to))
   end
 
-  def put_links(links, coords, key) do
-    List.foldl [coords, coords.location], links, &put_link(&2, &1, key)
+  defp put_links(links, coords, key) do
+    List.foldl link_keys(coords), links, &put_link(&2, &1, key)
   end
 
-  def update_store({links,store,bounds}, coords) do
+  defp update_store({links,store,bounds}, coords) do
     key = encode_key(coords.location)
 
     if valid_bounds(coords.bounds) and not cached?(store, key) do
@@ -90,39 +90,49 @@ defmodule Geocoder.Store do
     {links, store, bounds}
   end
 
-  def find_cached_bound(bounds, coords) do
+  defp find_cached_bound(bounds, coords) do
     bounds
     |> Enum.find(&within_bounds(coords, elem(&1, 1)))
     |> Maybe.wrap
     |> fmap(&elem(&1, 0))
   end
 
-  def within_bounds({lat,lon}, %{top: top, right: right, bottom: bottom, left: left}) do
+  defp within_bounds({lat,lon}, %{top: top, right: right, bottom: bottom, left: left}) do
     lat <= top and lat >= bottom and
     lon <= right and lon >= left
   end
 
-  def valid_bounds(%{top: top, right: right, bottom: bottom, left: left}) do
+  defp valid_bounds(%{top: top, right: right, bottom: bottom, left: left}) do
     not (is_nil(top) or is_nil(right) or is_nil(bottom) or is_nil(left))
   end
 
-  def encode_key(string) when is_binary(string) do
+  defp encode_key(string) when is_binary(string) do
     string
     |> String.replace(~r/[^\w]/, "")
     |> String.downcase
   end
 
-  def encode_key(%{lat: lat, lon: lon}) do
+  defp encode_key(%{lat: lat, lon: lon}) do
     encode_key({lat,lon})
   end
-  def encode_key({lat,lon}) do
+  defp encode_key({lat,lon}) do
     round = &Float.round(&1, 3)
     "#{round.(lat)},#{round.(lon)}"
   end
 
-  def encode_key(%{city: city, state: state, country: country}) do
+  defp encode_key(%{city: city, state: state, country: country}) do
     [city, state, country]
+    |> Enum.reject(&is_nil/1)
     |> Enum.join("")
     |> encode_key
+  end
+
+  defp link_keys(coords) do
+    location = coords.location
+    city = Map.get(location, :city)
+
+    [city, location, coords]
+    |> Enum.reject(&is_nil/1)
+    |> Enum.map(&encode_key/1)
   end
 end

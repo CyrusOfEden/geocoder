@@ -5,13 +5,10 @@ defmodule Geocoder.Worker do
   @defaults [
     timeout: 5000,
     stream_to: nil,
+    store: true
   ]
 
   # Public API
-  def call(q, opts \\ [])
-  def call(q, opts) when is_binary(q), do: geocode(q, opts)
-  def call(q = {_,_}, opts), do: reverse_geocode(q, opts)
-
   def geocode(address, opts \\ []) do
     opts = Keyword.merge(@defaults, opts)
     assign(:geocode, address, opts)
@@ -44,23 +41,26 @@ defmodule Geocoder.Worker do
     {:ok, state}
   end
 
-  def handle_call({function, param, _req_options}, _from, opts) do
-    {:reply, run(function, param, opts), opts}
+  def handle_call({function, param, req}, _from, opts) do
+    {:reply, run(function, param, opts, req[:store]), opts}
   end
 
-  def handle_cast({function, param, req_options}, opts) do
-    send(req_options[:stream_to], run(function, param, opts))
+  def handle_cast({function, param, req}, opts) do
+    send(req[:stream_to], run(function, param, opts, req[:store]))
     {:noreply, opts}
   end
 
-  defp run(function, param, [store: store, provider: provider]) do
-    case apply(store, function, [param]) do
+  defp run(function, param, opts, false) do
+    apply(opts[:provider], function, [param])
+    |> tap(&opts[:store].update/1)
+    |> tap(&opts[:store].link(param, &1))
+  end
+  defp run(function, param, opts, true) do
+    case apply(opts[:store], function, [param]) do
       {:just, coords} ->
         ok(coords)
       :nothing ->
-        apply(provider, function, [param])
-        |> tap(&store.update/1)
-        |> tap(&store.link(param, &1))
+        run(function, param, opts, false)
     end
   end
 end
