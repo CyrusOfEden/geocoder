@@ -13,7 +13,7 @@ Keep calm and add Geocoder to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
-  [{:geocoder, "~> 0.2"}]
+  [{:geocoder, "~> 0.3"}]
 end
 ```
 
@@ -31,13 +31,8 @@ Usage
 -----
 
 ```elixir
-Geocoder.geocode("Toronto, ON")
-Geocoder.reverse_geocode({43.653226, -79.383184})
-
-# Or use Geocoder.call, which calls the above depending on
-# whether a string was passed in or a 2-tuple
+Geocoder.call("Toronto, ON")
+Geocoder.call({43.653226, -79.383184})
 ```
 
 And you're done! How simple was that?
-
-_Note:_ It is possible to switch out Geocoder's built-in store or the default provider (currently Google Maps) by passing in different arguments to `Geocoder.start`, but those docs will come later. The store/provider must implement a specific API.
