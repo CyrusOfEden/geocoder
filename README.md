@@ -25,6 +25,15 @@ def application do
 end
 ```
 
+Set pool configuration:
+
+```elixir
+config :geocoder, :worker_pool_config, [
+  size: 4,
+  max_overflow: 2
+]
+```
+
 Let's rumble!
 
 Usage
