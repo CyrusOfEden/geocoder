@@ -2,43 +2,26 @@ defmodule Geocoder.Worker do
   use GenServer
   use Towel
 
-  @defaults [
-    timeout: 5000,
-    stream_to: nil,
-    store: true
-  ]
-
   # Public API
   def geocode(address, opts \\ []) do
-    opts = Keyword.merge(@defaults, opts)
     assign(:geocode, address, opts)
   end
 
   def reverse_geocode(latlon, opts \\ []) do
-    opts = Keyword.merge(@defaults, opts)
     assign(:reverse_geocode, latlon, opts)
   end
 
-  defp assign(name, param, opts) do
-    function = case {opts[:stream_to], {name, param, opts}} do
-      {nil, message} -> &GenServer.call(&1, message)
-      {_,   message} -> &GenServer.cast(&1, message)
-    end
-
-    :poolboy.transaction Geocoder.pool_name, function, opts[:timeout]
-  end
-
   # GenServer API
-  def start_link(_) do
-    opts = [
-      store: Geocoder.Store,
-      provider: Geocoder.Providers.GoogleMaps
-    ]
-    GenServer.start_link(__MODULE__, opts)
+  @worker_defaults [
+    store: Geocoder.Store,
+    provider: Geocoder.Providers.GoogleMaps
+  ]
+  def init(opts) do
+    {:ok, Keyword.merge(@worker_defaults, opts)}
   end
 
-  def init(state) do
-    {:ok, state}
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts)
   end
 
   def handle_call({function, param, req}, _from, opts) do
@@ -46,8 +29,28 @@ defmodule Geocoder.Worker do
   end
 
   def handle_cast({function, param, req}, opts) do
-    send(req[:stream_to], run(function, param, opts, req[:store]))
+    Task.start_link fn ->
+      send(req[:stream_to], run(function, param, opts, req[:store]))
+    end
     {:noreply, opts}
+  end
+
+  # Private API
+  @assign_defaults [
+    timeout: 5000,
+    stream_to: nil,
+    store: true
+  ]
+
+  defp assign(name, param, opts) do
+    opts = Keyword.merge(@assign_defaults, opts)
+
+    function = case {opts[:stream_to], {name, param, opts}} do
+      {nil, message} -> &GenServer.call(&1, message)
+      {_,   message} -> &GenServer.cast(&1, message)
+    end
+
+    :poolboy.transaction(Geocoder.pool_name, function, opts[:timeout])
   end
 
   defp run(function, param, opts, false) do

@@ -1,21 +1,25 @@
 defmodule Geocoder do
   use Application
 
-  def pool_name, do: :geocoder_workers
-  def config do
+  @pool_name :geocoder_workers
+  @default_config [worker_module: Geocoder.Worker, name: {:local, @pool_name}]
+
+  def pool_name, do: @pool_name
+  def worker_config do
     Application.get_env(:geocoder, :worker_pool_config)
-    |> Enum.into([
-      worker_module: Geocoder.Worker,
-      name: {:local, pool_name}
-    ])
+    |> Keyword.merge(@default_config)
+  end
+
+  def store_config do
+    Application.get_env(:geocoder, :store_config) || []
   end
 
   def start(_type, _opts) do
     import Supervisor.Spec
 
     children = [
-      :poolboy.child_spec(pool_name, config, []),
-      worker(Geocoder.Store, [])
+      :poolboy.child_spec(pool_name, worker_config, []),
+      worker(Geocoder.Store, store_config)
     ]
 
     options = [

@@ -2,137 +2,87 @@ defmodule Geocoder.Store do
   use GenServer
   use Towel
 
-  @name :geocoder_store
-
   # Public API
-  def state do
-    GenServer.call @name, :state
+  def geocode(location) do
+    GenServer.call(name, {:geocode, location})
   end
 
-  def geocode(address) do
-    GenServer.call @name, {:geocode, address}
+  def reverse_geocode({lat, lon}) do
+    GenServer.call(name, {:reverse_geocode, {lat, lon}})
   end
 
-  def reverse_geocode(latlon) do
-    GenServer.call @name, {:reverse_geocode, latlon}
-  end
-
-  def update(coords) do
-    GenServer.cast @name, {:update, coords}
+  def update(location) do
+    GenServer.call(name, {:update, location})
   end
 
   def link(from, to) do
-    GenServer.cast @name, {:link, from, to}
+    GenServer.cast(name, {:link, from, to})
+  end
+
+  def state do
+    GenServer.call(name, :state)
   end
 
   # GenServer API
-  def start_link(state \\ nil) do
-    # {links, store, bounds}
-    GenServer.start_link(__MODULE__, state || {%{}, %{}, []}, name: @name)
+  @defaults [precision: 4]
+  def start_link(opts \\ []) do
+    opts = Keyword.merge(@defaults, opts)
+    GenServer.start_link(__MODULE__, {%{}, %{}, opts}, [name: name])
   end
 
+  # Fetch geocode
+  def handle_call({:geocode, location}, _from, {links,store,_} = state) do
+    key = encode(location)
+    result = Maybe.wrap(links) |> fmap(&Map.get(&1, key)) |> fmap(&Map.get(store, &1))
+    {:reply, result, state}
+  end
+
+  # Fetch reverse geocode
+  def handle_call({:reverse_geocode, latlon}, _from, {_,store,opts} = state) do
+    key = encode(latlon, opts[:precision])
+    result = Maybe.wrap(store) |> fmap(&Map.get(&1, key))
+    {:reply, result, state}
+  end
+
+  # Update store
+  def handle_call({:update, coords}, _from, {links,store,opts}) do
+    %{lat: lat, lon: lon} = coords
+    %{city: city, state: state, country: country} = coords.location
+
+    key = encode({lat, lon}, opts[:precision])
+    link = encode(city <> state <> country)
+
+    state = {Map.put(links, link, key), Map.put(store, key, coords), opts}
+    {:reply, coords, state}
+  end
+
+  # Get the state
   def handle_call(:state, _from, state) do
     {:reply, state, state}
   end
 
-  def handle_call({:geocode, key}, _from, state = {links,store,_}) do
-    {:reply, fmap(get_link(links, key), &Map.get(store, &1)), state}
-  end
-
-  def handle_call({:reverse_geocode, latlon}, _from, state = {links,store,bounds}) do
-    case get_link(links, latlon) do
-      {:just, key} ->
-        {:reply, get_value(store, key), state}
-      :nothing ->
-        {:reply, bind(find_cached_bound(bounds, latlon), &get_value(store, &1)), state}
-    end
-  end
-
-  def handle_cast({:update, coords}, store) do
-    {:noreply, update_store(store, coords)}
-  end
-
-  def handle_cast({:link, from, to}, store = {links,_,_}) do
-    links = put_link(links, from, encode_key(to.location))
-    {:noreply, put_elem(store, 0, links)}
+  # Link a query to a cached value
+  def handle_cast({:link, from, %{lat: lat, lon: lon}}, {links,store,opts}) do
+    key = encode({lat, lon}, opts[:precision])
+    link = encode(from, opts[:precision])
+    {:noreply, {Map.put(links, link, key), store, opts}}
   end
 
   # Private API
-  defp cached?(store, coords) do
-    Map.has_key?(store, encode_key(coords))
+  defp encode(location, opt \\ nil)
+  defp encode({lat, lon}, precision) do
+    :geohash.encode(:erlang.float(lat), :erlang.float(lon), precision)
+    |> Result.unwrap
   end
-
-  defp get_value(store, key) do
-    store |> Map.get(key) |> Maybe.wrap
-  end
-
-  defp get_link(links, key) do
-    links |> Map.get(encode_key(key)) |> Maybe.wrap
-  end
-
-  defp put_link(links, from, to) do
-    Map.put(links, encode_key(from), encode_key(to))
-  end
-
-  defp put_links(links, coords, key) do
-    List.foldl link_keys(coords), links, &put_link(&2, &1, key)
-  end
-
-  defp update_store({links,store,bounds}, coords) do
-    key = encode_key(coords.location)
-
-    if valid_bounds(coords.bounds) and not cached?(store, key) do
-      bounds = [{key, coords.bounds}|bounds]
-    end
-    links = put_links(links, coords, key)
-    store = Map.put(store, key, coords)
-
-    {links, store, bounds}
-  end
-
-  defp find_cached_bound(bounds, coords) do
-    bounds
-    |> Enum.find(&within_bounds(coords, elem(&1, 1)))
-    |> Maybe.wrap
-    |> fmap(&elem(&1, 0))
-  end
-
-  defp within_bounds({lat,lon}, %{top: top, right: right, bottom: bottom, left: left}) do
-    lat <= top and lat >= bottom and
-    lon <= right and lon >= left
-  end
-
-  defp valid_bounds(%{top: top, right: right, bottom: bottom, left: left}) do
-    not (is_nil(top) or is_nil(right) or is_nil(bottom) or is_nil(left))
-  end
-
-  defp encode_key(string) when is_binary(string) do
-    string
-    |> String.replace(~r/[^\w]/, "")
+  defp encode(location, _) when is_binary(location) do
+    location
     |> String.downcase
+    |> String.replace(~r/[^\w]/, "")
+    |> String.strip
+    |> :base64.encode
   end
 
-  defp encode_key(%{lat: lat, lon: lon}) do
-    encode_key({lat,lon})
-  end
-  defp encode_key({lat,lon}) do
-    round = &Float.round(&1, 3)
-    "#{round.(lat)},#{round.(lon)}"
-  end
-
-  defp encode_key(%{city: city, state: state, country: country}) do
-    [city, state, country]
-    |> Enum.reject(&is_nil/1)
-    |> Enum.join("")
-    |> encode_key
-  end
-
-  defp link_keys(coords) do
-    location = coords.location
-    city = Map.get(location, :city)
-
-    [city, location, coords]
-    |> Enum.reject(&is_nil/1)
-    |> Enum.map(&encode_key/1)
-  end
+  # Config
+  @name :geocoder_store
+  def name, do: @name
 end

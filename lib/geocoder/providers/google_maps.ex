@@ -53,14 +53,14 @@ defmodule Geocoder.Providers.GoogleMaps do
     type = fn component ->
       component |> Map.get("types") |> Enum.find(&Enum.member?(@components, &1))
     end
-
     map = &({type.(&1), name.(&1)})
+    reduce = fn {type, name}, location ->
+      Map.put(location, Map.get(@map, type), name)
+    end
 
     components
     |> Enum.filter_map(type, map)
-    |> Enum.reduce(%Geocoder.Location{}, fn {type, name}, location ->
-      Map.put(location, Map.get(@map, type), name)
-    end)
+    |> Enum.reduce(%Geocoder.Location{}, reduce)
   end
 
   defp request(path, params) do
