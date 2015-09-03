@@ -28,9 +28,17 @@ end
 Set pool configuration:
 
 ```elixir
-config :geocoder, :worker_pool_config, [
+config :geocoder, Geocoder.Worker, [
   size: 4,
   max_overflow: 2
+]
+```
+
+Set store configuration:
+
+```elixir
+config :geocoder, Geocoder.Store, [
+  precision: 4 # the default
 ]
 ```
 
