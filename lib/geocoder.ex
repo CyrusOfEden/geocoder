@@ -6,8 +6,8 @@ defmodule Geocoder do
 
   def pool_name, do: @pool_name
   def worker_config do
-    Application.get_env(:geocoder, Geocoder.Worker)
-    |> Keyword.merge(@default_config)
+    Keyword.merge(Application.get_env(:geocoder, Geocoder.Worker) || [],
+                  @default_config)
   end
 
   def store_config do
