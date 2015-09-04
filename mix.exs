@@ -28,6 +28,6 @@ defmodule Geocoder.Mixfile do
      {:poison, "~> 1.4"},
      {:towel, "~> 0.2"},
      {:poolboy, "~> 1.5"},
-     {:geohash, git: "https://github.com/treetopllc/geohash"}]
+     {:geohash, github: "treetopllc/geohash"}]
   end
 end
