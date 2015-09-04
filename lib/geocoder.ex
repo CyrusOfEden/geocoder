@@ -19,7 +19,7 @@ defmodule Geocoder do
 
     children = [
       :poolboy.child_spec(pool_name, worker_config, []),
-      worker(Geocoder.Store, store_config)
+      worker(Geocoder.Store, [store_config])
     ]
 
     options = [
