@@ -1,4 +1,4 @@
-%{"geohash": {:git, "https://github.com/treetopllc/geohash", "d662533ea50d80815acf36b8d101a2f579d43140", []},
+%{"geohash": {:git, "git://github.com/treetopllc/geohash.git", "d662533ea50d80815acf36b8d101a2f579d43140", []},
   "gode": {:git, "https://github.com/bradfordw/geode", "5a4c2c5822fec88c93b21a16308716ebff0fd86e", []},
   "hackney": {:hex, :hackney, "1.3.1"},
   "httpoison": {:hex, :httpoison, "0.7.2"},

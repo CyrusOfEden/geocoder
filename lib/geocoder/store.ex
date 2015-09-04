@@ -47,10 +47,14 @@ defmodule Geocoder.Store do
   # Update store
   def handle_call({:update, coords}, _from, {links,store,opts}) do
     %{lat: lat, lon: lon} = coords
-    %{city: city, state: state, country: country} = coords.location
+    location =
+      coords.location
+      |> Map.take(~w[city, state, country]a)
+      |> Enum.filter_map(&is_binary(elem(&1, 1)), &elem(&1, 1))
+      |> Enum.join("")
 
     key = encode({lat, lon}, opts[:precision])
-    link = encode(city <> state <> country)
+    link = encode(location)
 
     state = {Map.put(links, link, key), Map.put(store, key, coords), opts}
     {:reply, coords, state}
