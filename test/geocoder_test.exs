@@ -15,6 +15,7 @@ defmodule GeocoderTest do
     assert location.country == "Belgium"
     assert location.country_code == "BE"
     assert location.postal_code == "9032"
+    assert location.formatted_address == "Dikkelindestraat 46, 9032 Gent, Belgium"
     assert lat == 51.0774037
     assert lon == 3.7073742
   end

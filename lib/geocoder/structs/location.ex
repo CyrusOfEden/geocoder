@@ -5,5 +5,6 @@ defmodule Geocoder.Location do
             postal_code: nil,
             street: nil,
             street_number: nil,
-            country_code: nil
+            country_code: nil,
+            formatted_address: nil
 end

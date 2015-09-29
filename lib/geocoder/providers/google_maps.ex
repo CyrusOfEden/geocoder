@@ -52,7 +52,7 @@ defmodule Geocoder.Providers.GoogleMaps do
     "postal_code" => :postal_code,
     "country" => :country
   }
-  defp geocode_location(%{"address_components" => components}) do
+  defp geocode_location(%{"address_components" => components, "formatted_address" => formatted_address}) do
     name = &Map.get(&1, "long_name")
     type = fn component ->
       component |> Map.get("types") |> Enum.find(&Enum.member?(@components, &1))
@@ -65,7 +65,8 @@ defmodule Geocoder.Providers.GoogleMaps do
     country_code = Enum.find(components, fn(component) ->
       component |> Map.get("types") |> Enum.member?("country")
     end) |> Map.get("short_name")
-    location = %Geocoder.Location{country_code: country_code}
+
+    location = %Geocoder.Location{country_code: country_code, formatted_address: formatted_address}
 
     components
     |> Enum.filter_map(type, map)
