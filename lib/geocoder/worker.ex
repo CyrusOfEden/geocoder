@@ -7,9 +7,18 @@ defmodule Geocoder.Worker do
     assign(:geocode, address, opts)
   end
 
+  def geocode_list(address, opts \\ []) do
+    assign(:geocode_list, address, opts)
+  end
+  
   def reverse_geocode(latlon, opts \\ []) do
     assign(:reverse_geocode, latlon, opts)
   end
+
+  def reverse_geocode_list(address, opts \\ []) do
+    assign(:reverse_geocode_list, address, opts)
+  end
+  
 
   # GenServer API
   @worker_defaults [
@@ -53,6 +62,9 @@ defmodule Geocoder.Worker do
     :poolboy.transaction(Geocoder.pool_name, function, opts[:timeout])
   end
 
+  defp run(function, param, opts, _) when function == :geocode_list or function == :reverse_geocode_list do
+    apply(opts[:provider], function, [param])
+  end
   defp run(function, param, opts, false) do
     apply(opts[:provider], function, [param])
     |> tap(&opts[:store].update/1)

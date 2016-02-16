@@ -9,6 +9,11 @@ defmodule Geocoder.Providers.GoogleMaps do
     |> fmap(&parse_geocode/1)
   end
 
+  def geocode_list(address) when is_binary(address) do
+    request_all("maps/api/geocode/json", address: address)
+    |> fmap(fn(r) -> Enum.map(r, &parse_geocode/1) end)
+  end
+  
   def reverse_geocode(%{lat: lat, lon: lon}) do
     reverse_geocode({lat,lon})
   end
@@ -17,6 +22,11 @@ defmodule Geocoder.Providers.GoogleMaps do
     |> fmap(&parse_reverse_geocode/1)
   end
 
+  def reverse_geocode_list({lat,lon}) do
+    request_all("maps/api/geocode/json", [{"latlng", "#{lat},#{lon}"}])
+    |> fmap(fn(r) -> Enum.map(r, &parse_reverse_geocode/1) end)
+  end
+  
   defp parse_geocode(response) do
     coords = geocode_coords(response)
     bounds = geocode_bounds(response)
@@ -42,13 +52,17 @@ defmodule Geocoder.Providers.GoogleMaps do
   end
   defp geocode_bounds(_), do: %Geocoder.Bounds{}
 
-  @components ["locality", "administrative_area_level_1", "country"]
+  @components ["locality", "administrative_area_level_1", "country", "postal_code", "street", "street_number", "route"]
   @map %{
+    "street_number" => :street_number,
+    "route" => :street,
+    "street_address" => :street,
     "locality" => :city,
     "administrative_area_level_1" => :state,
+    "postal_code" => :postal_code,
     "country" => :country
   }
-  defp geocode_location(%{"address_components" => components}) do
+  defp geocode_location(%{"address_components" => components, "formatted_address" => formatted_address}) do
     name = &Map.get(&1, "long_name")
     type = fn component ->
       component |> Map.get("types") |> Enum.find(&Enum.member?(@components, &1))
@@ -58,15 +72,25 @@ defmodule Geocoder.Providers.GoogleMaps do
       Map.put(location, Map.get(@map, type), name)
     end
 
+    country_code = Enum.find(components, fn(component) ->
+      component |> Map.get("types") |> Enum.member?("country")
+    end) |> Map.get("short_name")
+
+    location = %Geocoder.Location{country_code: country_code, formatted_address: formatted_address}
+
     components
     |> Enum.filter_map(type, map)
-    |> Enum.reduce(%Geocoder.Location{}, reduce)
+    |> Enum.reduce(location, reduce)
   end
 
-  defp request(path, params) do
+  defp request_all(path, params) do
     get(path, [], params: Enum.into(params, %{}))
     |> fmap(&Map.get(&1, :body))
     |> fmap(&Map.get(&1, "results"))
+  end
+
+  defp request(path, params) do
+    request_all(path, params)
     |> fmap(&List.first/1)
   end
 
