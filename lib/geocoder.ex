@@ -35,4 +35,8 @@ defmodule Geocoder do
   def call(q, opts \\ [])
   def call(q, opts) when is_binary(q), do: Worker.geocode(q, opts)
   def call(q = {_,_}, opts), do: Worker.reverse_geocode(q, opts)
+  
+  def call_list(q, opts \\ [])
+  def call_list(q = {_,_}, opts), do: Worker.reverse_geocode_list(q, opts)
+  def call_list(q, opts) when is_binary(q), do: Worker.geocode_list(q, opts)
 end
