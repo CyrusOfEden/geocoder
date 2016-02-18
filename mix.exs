@@ -14,7 +14,7 @@ defmodule Geocoder.Mixfile do
 
   def package do
     [licenses: ["MIT"],
-     contributors: ["Kash Nouroozi", "Arjan Scherpenisse"],
+     maintainers: ["Kash Nouroozi", "Arjan Scherpenisse"],
      links: %{"GitHub" => "https://github.com/knrz/geocoder"}]
   end
 
