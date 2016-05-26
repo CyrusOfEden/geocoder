@@ -25,7 +25,7 @@ defmodule Geocoder.Mixfile do
 
   defp deps do
     [{:httpoison, "~> 0.8"},
-     {:poison, "~> 1.5"},
+     {:poison, "~> 1.5 or ~> 2.1.0"},
      {:towel, "~> 0.2"},
      {:poolboy, "~> 1.5"},
      {:geohash, "~> 0.1"}]
