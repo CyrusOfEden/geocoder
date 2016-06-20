@@ -32,11 +32,15 @@ defmodule Geocoder do
 
   alias Geocoder.Worker
 
+  def call(opts) when is_list(opts), do: Worker.geocode(opts)
+
   def call(q, opts \\ [])
-  def call(q, opts) when is_binary(q), do: Worker.geocode(q, opts)
-  def call(q = {_,_}, opts), do: Worker.reverse_geocode(q, opts)
-  
+  def call(q, opts) when is_binary(q), do: Worker.geocode(opts ++ [address: q])
+  def call(q = {_,_}, opts), do: Worker.reverse_geocode(opts ++ [latlng: q])
+  def call(%{lat: lat, lon: lon}, opts), do: call({lat, lon}, opts)
+
   def call_list(q, opts \\ [])
-  def call_list(q = {_,_}, opts), do: Worker.reverse_geocode_list(q, opts)
-  def call_list(q, opts) when is_binary(q), do: Worker.geocode_list(q, opts)
+  def call_list(q, opts) when is_binary(q), do: Worker.geocode_list(opts ++ [address: q])
+  def call_list(q = {_,_}, opts), do: Worker.reverse_geocode_list(opts ++ [latlng: q])
+  def call_list(%{lat: lat, lon: lon}, opts), do: call_list({lat, lon}, opts)
 end
