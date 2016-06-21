@@ -4,29 +4,37 @@ defmodule Geocoder.Providers.GoogleMaps do
 
   @endpoint "https://maps.googleapis.com/"
 
-  def geocode(address) when is_binary(address) do
-    request("maps/api/geocode/json", address: address)
+  def geocode(opts) do
+    request("maps/api/geocode/json", extract_opts(opts))
     |> fmap(&parse_geocode/1)
   end
 
-  def geocode_list(address) when is_binary(address) do
-    request_all("maps/api/geocode/json", address: address)
+  def geocode_list(opts) do
+    request_all("maps/api/geocode/json", extract_opts(opts))
     |> fmap(fn(r) -> Enum.map(r, &parse_geocode/1) end)
   end
-  
-  def reverse_geocode(%{lat: lat, lon: lon}) do
-    reverse_geocode({lat,lon})
-  end
-  def reverse_geocode({lat,lon}) do
-    request("maps/api/geocode/json", [{"latlng", "#{lat},#{lon}"}])
+
+  def reverse_geocode(opts) do
+    request("maps/api/geocode/json", extract_opts(opts))
     |> fmap(&parse_reverse_geocode/1)
   end
 
-  def reverse_geocode_list({lat,lon}) do
-    request_all("maps/api/geocode/json", [{"latlng", "#{lat},#{lon}"}])
+  def reverse_geocode_list(opts) do
+    request_all("maps/api/geocode/json", extract_opts(opts))
     |> fmap(fn(r) -> Enum.map(r, &parse_reverse_geocode/1) end)
   end
-  
+
+  defp extract_opts(opts) do
+    opts
+    |> Keyword.take([:key, :address, :components, :bounds, :language, :region,
+                     :latlng, :placeid, :result_type, :location_type])
+    |> Keyword.update(:latlng, nil, fn
+         {lat, lng} -> "#{lat},#{lng}"
+         q -> q
+       end)
+    |> Keyword.delete(:latlng, nil)
+  end
+
   defp parse_geocode(response) do
     coords = geocode_coords(response)
     bounds = geocode_bounds(response)

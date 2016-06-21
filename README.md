@@ -52,4 +52,12 @@ Geocoder.call("Toronto, ON")
 Geocoder.call({43.653226, -79.383184})
 ```
 
+You can pass options to the function that will be passed to the geocoder provider, for example:
+
+```elixir
+Geocoder.call(address: "Toronto, ON", language: "es", key: "...", ...)
+```
+
+See [here](https://developers.google.com/maps/documentation/geocoding/intro#geocoding) and [here](https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding) for a list of supported parameters for the default geocoder provider (`Geocoder.Provider.GoogleMaps`).
+
 And you're done! How simple was that?

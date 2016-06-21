@@ -3,45 +3,44 @@ defmodule Geocoder.Worker do
   use Towel
 
   # Public API
-  def geocode(address, opts \\ []) do
-    assign(:geocode, address, opts)
+  def geocode(q, opts \\ []) do
+    assign(:geocode, q, opts)
   end
 
-  def geocode_list(address, opts \\ []) do
-    assign(:geocode_list, address, opts)
-  end
-  
-  def reverse_geocode(latlon, opts \\ []) do
-    assign(:reverse_geocode, latlon, opts)
+  def geocode_list(q, opts \\ []) do
+    assign(:geocode_list, q, opts)
   end
 
-  def reverse_geocode_list(address, opts \\ []) do
-    assign(:reverse_geocode_list, address, opts)
+  def reverse_geocode(q, opts \\ []) do
+    assign(:reverse_geocode, q, opts)
   end
-  
+
+  def reverse_geocode_list(q, opts \\ []) do
+    assign(:reverse_geocode_list, q, opts)
+  end
 
   # GenServer API
   @worker_defaults [
     store: Geocoder.Store,
     provider: Geocoder.Providers.GoogleMaps
   ]
-  def init(opts) do
-    {:ok, Keyword.merge(@worker_defaults, opts)}
+  def init(conf) do
+    {:ok, Keyword.merge(@worker_defaults, conf)}
   end
 
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts)
+  def start_link(conf) do
+    GenServer.start_link(__MODULE__, conf)
   end
 
-  def handle_call({function, param, req}, _from, opts) do
-    {:reply, run(function, param, opts, req[:store]), opts}
+  def handle_call({function, q, opts}, _from, conf) do
+    {:reply, run(function, q, conf, opts[:store]), conf}
   end
 
-  def handle_cast({function, param, req}, opts) do
+  def handle_cast({function, q, opts}, conf) do
     Task.start_link fn ->
-      send(req[:stream_to], run(function, param, opts, req[:store]))
+      send(opts[:stream_to], run(function, conf, q, opts[:store]))
     end
-    {:noreply, opts}
+    {:noreply, conf}
   end
 
   # Private API
@@ -51,10 +50,10 @@ defmodule Geocoder.Worker do
     store: true
   ]
 
-  defp assign(name, param, opts) do
+  defp assign(name, q, opts) do
     opts = Keyword.merge(@assign_defaults, opts)
 
-    function = case {opts[:stream_to], {name, param, opts}} do
+    function = case {opts[:stream_to], {name, q, opts}} do
       {nil, message} -> &GenServer.call(&1, message)
       {_,   message} -> &GenServer.cast(&1, message)
     end
@@ -62,20 +61,20 @@ defmodule Geocoder.Worker do
     :poolboy.transaction(Geocoder.pool_name, function, opts[:timeout])
   end
 
-  defp run(function, param, opts, _) when function == :geocode_list or function == :reverse_geocode_list do
-    apply(opts[:provider], function, [param])
+  defp run(function, q, conf, _) when function == :geocode_list or function == :reverse_geocode_list do
+    apply(conf[:provider], function, [q])
   end
-  defp run(function, param, opts, false) do
-    apply(opts[:provider], function, [param])
-    |> tap(&opts[:store].update/1)
-    |> tap(&opts[:store].link(param, &1))
+  defp run(function, conf, q, false) do
+    apply(conf[:provider], function, [q])
+    |> tap(&conf[:store].update/1)
+    |> tap(&conf[:store].link(q, &1))
   end
-  defp run(function, param, opts, true) do
-    case apply(opts[:store], function, [param]) do
+  defp run(function, q, conf, true) do
+    case apply(conf[:store], function, [q]) do
       {:just, coords} ->
         ok(coords)
       :nothing ->
-        run(function, param, opts, false)
+        run(function, conf, q, false)
     end
   end
 end

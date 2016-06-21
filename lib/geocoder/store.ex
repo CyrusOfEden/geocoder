@@ -3,12 +3,12 @@ defmodule Geocoder.Store do
   use Towel
 
   # Public API
-  def geocode(location) do
-    GenServer.call(name, {:geocode, location})
+  def geocode(opts) do
+    GenServer.call(name, {:geocode, opts[:address]})
   end
 
-  def reverse_geocode({lat, lon}) do
-    GenServer.call(name, {:reverse_geocode, {lat, lon}})
+  def reverse_geocode(opts) do
+    GenServer.call(name, {:reverse_geocode, opts[:latlng]})
   end
 
   def update(location) do
@@ -66,9 +66,9 @@ defmodule Geocoder.Store do
   end
 
   # Link a query to a cached value
-  def handle_cast({:link, from, %{lat: lat, lon: lon}}, {links,store,opts}) do
+  def handle_cast({:link, from, %{lat: lat, lon: lon}}, {links, store, opts}) do
     key = encode({lat, lon}, opts[:precision])
-    link = encode(from, opts[:precision])
+    link = encode(from[:address] || from[:latlng], opts[:precision])
     {:noreply, {Map.put(links, link, key), store, opts}}
   end
 
