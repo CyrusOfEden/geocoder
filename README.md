@@ -42,6 +42,13 @@ config :geocoder, Geocoder.Store, [
 ]
 ```
 
+If you need to set a proxy (or any other option supported by HTTPoison.get/3):
+
+```elixir
+config :geocoder, Geocoder.Worker, [
+  httpoison_options: [proxy: "my.proxy.server:3128", proxy_auth: {"username", "password"}]
+]
+
 Let's rumble!
 
 Usage
