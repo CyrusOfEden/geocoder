@@ -92,7 +92,8 @@ defmodule Geocoder.Providers.GoogleMaps do
   end
 
   defp request_all(path, params) do
-    get(path, [], params: Enum.into(params, %{}))
+    httpoison_options = Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || []
+    get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{})))
     |> fmap(&Map.get(&1, :body))
     |> fmap(&Map.get(&1, "results"))
   end
