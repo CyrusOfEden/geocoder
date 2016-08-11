@@ -80,9 +80,16 @@ defmodule Geocoder.Providers.GoogleMaps do
       Map.put(location, Map.get(@map, type), name)
     end
 
-    country_code = Enum.find(components, fn(component) ->
+    country = Enum.find(components, fn(component) ->
       component |> Map.get("types") |> Enum.member?("country")
-    end) |> Map.get("short_name")
+    end)
+
+    country_code = case country do
+      nil ->
+        nil
+    %{"short_name" => name} ->
+        name
+    end
 
     location = %Geocoder.Location{country_code: country_code, formatted_address: formatted_address}
 
