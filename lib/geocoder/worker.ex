@@ -54,7 +54,7 @@ defmodule Geocoder.Worker do
     opts = Keyword.merge(@assign_defaults, opts)
 
     function = case {opts[:stream_to], {name, q, opts}} do
-      {nil, message} -> &GenServer.call(&1, message)
+      {nil, message} -> &GenServer.call(&1, message, opts[:timeout])
       {_,   message} -> &GenServer.cast(&1, message)
     end
 
