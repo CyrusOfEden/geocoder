@@ -28,6 +28,7 @@ defmodule Geocoder.Mixfile do
      {:poison, "~> 1.5 or ~> 2.2"},
      {:towel, "~> 0.2"},
      {:poolboy, "~> 1.5"},
-     {:geohash, "~> 0.1"}]
+     {:geohash, "~> 0.1"},
+     {:ex_doc, ">= 0.0", only: :dev}]
   end
 end
