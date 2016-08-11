@@ -29,6 +29,6 @@ defmodule Geocoder.Mixfile do
      {:towel, "~> 0.2"},
      {:poolboy, "~> 1.5"},
      {:geohash, "~> 0.1"},
-     {:ex_doc, ">= 0.0", only: :dev}]
+     {:ex_doc, ">= 0.0.0", only: :dev}]
   end
 end
