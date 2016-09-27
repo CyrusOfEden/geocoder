@@ -23,23 +23,30 @@ defmodule GeocoderTest do
     assert is_list(coords)
     assert Enum.count(coords) > 0
   end
-  
+
   defp assert_belgium(coords) do
-    %Geocoder.Coords{bounds: _bounds, location: location, lat: lat, lon: lon} = coords
+    %Geocoder.Coords{bounds: bounds, location: location, lat: lat, lon: lon} = coords
+
     # Bounds are not always returned
-    # assert bounds.bottom == 51.0773992
-    # assert bounds.left == 3.7073572
-    # assert bounds.right == 3.7073742
-    # assert bounds.top == 51.0774037
+    assert (nil == bounds.bottom) || (bounds.bottom |> Float.round(2) == 51.08)
+    assert (nil == bounds.left) || (bounds.left |> Float.round(2) == 3.71)
+    assert (nil == bounds.right) || (bounds.right |> Float.round(2) == 3.71)
+    assert (nil == bounds.top) || (bounds.top |> Float.round(2) == 51.08)
+
+    assert nil == location.street_number || location.street_number == "46"
     assert location.street == "Dikkelindestraat"
-    assert location.street_number == "46"
     assert location.city == "Gent"
     assert location.country == "Belgium"
-    assert location.country_code == "BE"
+    assert location.country_code |> String.upcase == "BE"
     assert location.postal_code == "9032"
-    assert location.formatted_address == "Dikkelindestraat 46, 9032 Gent, Belgium"
-    assert lat == 51.0775264
-    assert lon == 3.7073382
+    #      lhs:  "Dikkelindestraat, Wondelgem, Ghent, Gent, East Flanders, Flanders, 9032, Belgium"
+    #      rhs:  "Dikkelindestraat 46, 9032 Gent, Belgium"
+    assert location.formatted_address |> String.match?(~r/Dikkelindestraat/)
+    assert location.formatted_address |> String.match?(~r/Gent/)
+    assert location.formatted_address |> String.match?(~r/9032/)
+    assert location.formatted_address |> String.match?(~r/Belgium/)
+    assert lat |> Float.round(2) == 51.08
+    assert lon |> Float.round(2) == 3.71
   end
 
 end
