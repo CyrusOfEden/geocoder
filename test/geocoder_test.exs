@@ -1,3 +1,4 @@
+require IEx
 defmodule GeocoderTest do
   use ExUnit.Case
 
@@ -25,6 +26,7 @@ defmodule GeocoderTest do
   end
 
   defp assert_belgium(coords) do
+    IEx.pry
     %Geocoder.Coords{bounds: bounds, location: location, lat: lat, lon: lon} = coords
 
     # Bounds are not always returned

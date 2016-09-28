@@ -36,7 +36,7 @@ defmodule Geocoder do
 
   def call(q, opts \\ [])
   def call(q, opts) when is_binary(q), do: Worker.geocode(opts ++ [address: q])
-  def call(q = {lat,lon}, opts), do: Worker.reverse_geocode(opts ++ [lat: lat, lon: lon, latlng: q])
+  def call(q = {lat,lon}, opts), do: Worker.reverse_geocode(opts ++ [latlng: q])
   def call(%{lat: lat, lon: lon}, opts), do: call({lat, lon}, opts)
 
   def call_list(q, opts \\ [])

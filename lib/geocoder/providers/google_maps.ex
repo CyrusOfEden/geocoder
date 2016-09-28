@@ -1,120 +1,198 @@
+require IEx
+
 defmodule Geocoder.Providers.GoogleMaps do
   use HTTPoison.Base
   use Towel
 
-  @endpoint "https://maps.googleapis.com/"
+  @doc """
+      {
+         "results" : [
+            {
+               "address_components" : [
+                  {
+                     "long_name" : "1600",
+                     "short_name" : "1600",
+                     "types" : [ "street_number" ]
+                  },
+                  {
+                     "long_name" : "Amphitheatre Pkwy",
+                     "short_name" : "Amphitheatre Pkwy",
+                     "types" : [ "route" ]
+                  },
+                  {
+                     "long_name" : "Mountain View",
+                     "short_name" : "Mountain View",
+                     "types" : [ "locality", "political" ]
+                  },
+                  {
+                     "long_name" : "Santa Clara County",
+                     "short_name" : "Santa Clara County",
+                     "types" : [ "administrative_area_level_2", "political" ]
+                  },
+                  {
+                     "long_name" : "California",
+                     "short_name" : "CA",
+                     "types" : [ "administrative_area_level_1", "political" ]
+                  },
+                  {
+                     "long_name" : "United States",
+                     "short_name" : "US",
+                     "types" : [ "country", "political" ]
+                  },
+                  {
+                     "long_name" : "94043",
+                     "short_name" : "94043",
+                     "types" : [ "postal_code" ]
+                  }
+               ],
+               "formatted_address" : "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+               "geometry" : {
+                  "location" : {
+                     "lat" : 37.4224764,
+                     "lng" : -122.0842499
+                  },
+                  "location_type" : "ROOFTOP",
+                  "viewport" : {
+                     "northeast" : {
+                        "lat" : 37.4238253802915,
+                        "lng" : -122.0829009197085
+                     },
+                     "southwest" : {
+                        "lat" : 37.4211274197085,
+                        "lng" : -122.0855988802915
+                     }
+                  }
+               },
+               "place_id" : "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
+               "types" : [ "street_address" ]
+            }
+         ],
+         "status" : "OK"
+      }
+  """
+  defstruct address_components: [],
+            formatted_address: nil,
+            geometry: %{
+              location: %{lat: nil, lng: nil},
+              location_type: nil,
+              viewport: %{
+                northeast: %{lat: nil, lng: nil},
+                southwest: %{lat: nil, lng: nil}
+              }
+            },
+            place_id: nil,
+            types: []
 
-  def geocode(opts) do
-    request("maps/api/geocode/json", extract_opts(opts))
-    |> fmap(&parse_geocode/1)
+  ##############################################################################
+
+  def new({lat, lng}) do
+    %Geocoder.Providers.GoogleMaps{
+      geometry: %{
+        location: %{lat: lat, lng: lng},
+        location_type: nil,
+        viewport: %{
+          northeast: %{lat: nil, lng: nil},
+          southwest: %{lat: nil, lng: nil}
+        }
+      }
+    }
   end
 
-  def geocode_list(opts) do
-    request_all("maps/api/geocode/json", extract_opts(opts))
-    |> fmap(fn(r) -> Enum.map(r, &parse_geocode/1) end)
+  def new(address) when is_binary(address) do
+    %Geocoder.Providers.GoogleMaps{formatted_address: address}
   end
 
-  def reverse_geocode(opts) do
-    request("maps/api/geocode/json", extract_opts(opts))
-    |> fmap(&parse_reverse_geocode/1)
+  def new(data) when is_map(data) do
+    %Geocoder.Providers.GoogleMaps{} |> Map.merge(data |> atomize_keys)
   end
 
-  def reverse_geocode_list(opts) do
-    request_all("maps/api/geocode/json", extract_opts(opts))
-    |> fmap(fn(r) -> Enum.map(r, &parse_reverse_geocode/1) end)
-  end
+  ##############################################################################
 
-  defp extract_opts(opts) do
-    opts
-    |> Keyword.take([:key, :address, :components, :bounds, :language, :region,
-                     :latlng, :placeid, :result_type, :location_type])
-    |> Keyword.update(:latlng, nil, fn
-         {lat, lng} -> "#{lat},#{lng}"
-         q -> q
-       end)
-    |> Keyword.delete(:latlng, nil)
-  end
-
-  defp parse_geocode(response) do
-    coords = geocode_coords(response)
-    bounds = geocode_bounds(response)
-    location = geocode_location(response)
-    %{coords | bounds: bounds, location: location}
-  end
-
-  defp parse_reverse_geocode(response) do
-    coords = geocode_coords(response)
-    location = geocode_location(response)
-    %{coords | location: location}
-  end
-
-  defp geocode_coords(%{"geometry" => %{"location" => coords}}) do
-    %{"lat" => lat, "lng" => lon} = coords
-    %Geocoder.Coords{lat: lat, lon: lon}
-  end
-
-  defp geocode_bounds(%{"geometry" => %{"bounds" => bounds}}) do
-    %{"northeast" => %{"lat" => north, "lng" => east},
-      "southwest" => %{"lat" => south, "lng" => west}} = bounds
-    %Geocoder.Bounds{top: north, right: east, bottom: south, left: west}
-  end
-  defp geocode_bounds(_), do: %Geocoder.Bounds{}
-
-  @components ["locality", "administrative_area_level_1", "country", "postal_code", "street", "street_number", "route"]
-  @map %{
-    "street_number" => :street_number,
-    "route" => :street,
-    "street_address" => :street,
-    "locality" => :city,
-    "administrative_area_level_1" => :state,
-    "postal_code" => :postal_code,
-    "country" => :country
-  }
-  defp geocode_location(%{"address_components" => components, "formatted_address" => formatted_address}) do
-    name = &Map.get(&1, "long_name")
-    type = fn component ->
-      component |> Map.get("types") |> Enum.find(&Enum.member?(@components, &1))
+  defimpl Geocoder.Data, for: Geocoder.Providers.GoogleMaps do
+    def address(data) do
+      case data.formatted_address do
+        "" -> nil
+        result -> result
+      end
     end
-    map = &({type.(&1), name.(&1)})
-    reduce = fn {type, name}, location ->
-      Map.put(location, Map.get(@map, type), name)
+
+    # TODO: should we make use of "political" type?
+    def components(data) do
+      result = data.address_components |> Enum.reduce(%{},
+        fn %{long_name: long_name, short_name: _short_name, types: [type | _]}, acc ->
+          acc |> Map.put(type |> String.to_atom, long_name) # TODO: should we make use of "short_name"?
+        end)
+
+      if result |> Enum.empty?, do: nil, else: result
     end
 
-    country = Enum.find(components, fn(component) ->
-      component |> Map.get("types") |> Enum.member?("country")
-    end)
+    def latlng(data) do
+      case data.geometry.location do
+        %{lat: nil, lng: _} -> nil
+        %{lat: nil, lon: _} -> nil
+        %{lat: _, lng: nil} -> nil
+        %{lat: _, lon: nil} -> nil
+        %{lat: lat, lng: lng} -> %Geocoder.Coords{lat: lat, lon: lng}
+        %{lat: lat, lon: lon} -> %Geocoder.Coords{lat: lat, lon: lon}
+        result -> result
+      end
+    end
 
-    country_code = case country do
-      nil ->
+    def place_id(data) do
+      case data.place_id do
+        "" -> nil
+        result -> result
+      end
+    end
+
+    def bounds(data) do
+      %{northeast: %{lat: north, lng: east},
+        southwest: %{lat: south, lng: west}} = data.geometry.viewport
+      if north == nil or east == nil or south == nil or west == nil do
         nil
-    %{"short_name" => name} ->
-        name
+      else
+        %Geocoder.Bounds{top: north, right: east, bottom: south, left: west}
+      end
     end
 
-    location = %Geocoder.Location{country_code: country_code, formatted_address: formatted_address}
+    def result_type(data) do
+      case data.types do
+        [] -> nil
+        result -> result
+      end
+    end
 
-    components
-    |> Enum.filter_map(type, map)
-    |> Enum.reduce(location, reduce)
+    def query(data) do
+      acc = %{}
+
+      unless (d = address(data)) == nil, do: acc = acc |> put_in([:address], d)
+      unless (d = components(data)) == nil do
+        d = d |> Enum.map(fn {k, v} -> "#{k}:#{v}" end) |> Enum.join("|")
+        acc = acc |> put_in([:components], d)
+      end
+      unless (d = latlng(data)) == nil, do: acc = acc |> put_in([:latlng], "#{d}")
+      unless (d = place_id(data)) == nil, do: acc = acc |> put_in([:place_id], d)
+      unless (d = bounds(data)) == nil, do: acc = acc |> put_in([:bounds], "#{d}")
+      if is_list(d = result_type(data)), do: acc = acc |> put_in([:address], d |> Enum.join("|"))
+
+      acc |> Map.to_list
+    end
+
+    def endpoint(_, _) do
+      "https://maps.googleapis.com/maps/api/geocode/json"
+    end
   end
 
-  defp request_all(path, params) do
-    httpoison_options = Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || []
-    get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{})))
-    |> fmap(&Map.get(&1, :body))
-    |> fmap(&Map.get(&1, "results"))
-  end
+  ##############################################################################
 
-  defp request(path, params) do
-    request_all(path, params)
-    |> fmap(&List.first/1)
+  defp atomize_keys(map) when is_map(map) do
+    for {k, v} <- map, into: %{} do
+      {String.to_atom(k), atomize_keys(v)}
+    end
   end
+  defp atomize_keys(list) when is_list(list) do
+    list |> Enum.map(&atomize_keys(&1))
+  end
+  defp atomize_keys(val), do: val
 
-  defp process_url(url) do
-    @endpoint <> url
-  end
-
-  defp process_response_body(body) do
-    body |> Poison.decode!
-  end
 end
