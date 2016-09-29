@@ -94,3 +94,16 @@ defprotocol Geocoder.Data do
   """
   def endpoint(data, type)
 end
+
+# Should we just map everything to lists here?
+# defimpl Geocoder.Data, for: List do
+#   def address(data)
+#   def components(data)
+#   def location(data)
+#   def latlng(data)
+#   def place_id(data)
+#   def bounds(data)
+#   def result_type(data)
+#   def query(data)
+#   def endpoint(data, type)
+# end

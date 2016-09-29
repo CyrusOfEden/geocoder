@@ -36,11 +36,15 @@ defmodule Geocoder do
 
   def call(q, opts \\ [])
   def call(q, opts) when is_binary(q), do: Worker.geocode(opts ++ [address: q])
-  def call(q = {lat,lon}, opts), do: Worker.reverse_geocode(opts ++ [latlng: q])
+  def call({lat,lon}, opts), do: Worker.reverse_geocode(opts ++ [latlng: {lat,lon}])
   def call(%{lat: lat, lon: lon}, opts), do: call({lat, lon}, opts)
+  def call(%Geocoder.Coords{lat: lat, lon: lon}, opts), do: call({lat, lon}, opts)
+  def call(q, opts) when is_map(q), do: call(q |> Geocoder.Data.latlng || q |> Geocoder.Data.address, opts)
 
   def call_list(q, opts \\ [])
   def call_list(q, opts) when is_binary(q), do: Worker.geocode_list(opts ++ [address: q])
   def call_list(q = {_,_}, opts), do: Worker.reverse_geocode_list(opts ++ [latlng: q])
   def call_list(%{lat: lat, lon: lon}, opts), do: call_list({lat, lon}, opts)
+  def call_list(%Geocoder.Coords{lat: lat, lon: lon}, opts), do: call_list({lat, lon}, opts)
+  def call_list(q, opts) when is_map(q), do: call_list(q |> Geocoder.Data.latlng || q |> Geocoder.Data.address, opts)
 end

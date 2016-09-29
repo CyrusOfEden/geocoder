@@ -1,4 +1,4 @@
-defmodule Geocoder.Providers.GoogleMaps do
+defmodule Geocoder.GoogleMaps do
   @doc """
       {
          "results" : [
@@ -81,7 +81,7 @@ defmodule Geocoder.Providers.GoogleMaps do
   ##############################################################################
 
   def new({lat, lng}) do
-    %Geocoder.Providers.GoogleMaps{
+    %Geocoder.GoogleMaps{
       geometry: %{
         location: %{lat: lat, lng: lng},
         location_type: nil,
@@ -94,24 +94,25 @@ defmodule Geocoder.Providers.GoogleMaps do
   end
 
   def new(address) when is_binary(address) do
-    %Geocoder.Providers.GoogleMaps{formatted_address: address}
+    %Geocoder.GoogleMaps{formatted_address: address}
   end
 
   def new(data) when is_map(data) do
-    case data[:results] || data["results"] do
+    result = data[:results] || data["results"]
+    case result do
       nil      -> one_from_map(data)
-      [one]    -> one_from_map(one)
-      [_ | _]  -> data[:results] |> Enum.map(&one_from_map(&1))
+      # [one]    -> one_from_map(one)
+      [_ | _]  -> result |> Enum.map(&one_from_map(&1))
     end
   end
 
   defp one_from_map(data) when is_map(data) do
-    %Geocoder.Providers.GoogleMaps{} |> Map.merge(data |> atomize_keys)
+    %Geocoder.GoogleMaps{} |> Map.merge(data |> atomize_keys)
   end
 
   ##############################################################################
 
-  defimpl Geocoder.Data, for: Geocoder.Providers.GoogleMaps do
+  defimpl Geocoder.Data, for: Geocoder.GoogleMaps do
     def address(data) do
       data.formatted_address
     end

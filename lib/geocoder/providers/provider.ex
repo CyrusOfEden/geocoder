@@ -10,7 +10,6 @@ defmodule Geocoder.Providers.Provider do
   end
 
   def go!(data, %Geocoder.QueryParams{} = params, provider) do # Geocoder.Worker.provider?
-    data = if Keyword.keyword?(data), do: data[:address] || data[:latlng], else: data
     input = if Geocoder.Data.impl_for(data) == nil, do: apply(provider, :new, [data]), else: data
     params = Keyword.merge(
       Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || [],
