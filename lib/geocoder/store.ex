@@ -46,21 +46,9 @@ defmodule Geocoder.Store do
 
   # Update store
   def handle_call({:update, data}, from, {links, store, opts}) when is_list(data) do
-    map = data |> Enum.reduce(%{links: links, store: store}, fn e, acc ->
-                    {l, s} = update_single(acc[:store], acc[:links], e, opts[:precision])
-                    %{links: l, store: s}
-                  end)
-    {:reply, data, {map[:links], map[:store], opts}}
+    {l, s} = data |> Enum.reduce({links, store}, &update_single(&2, &1, opts[:precision]))
+    {:reply, data, {l, s, opts}}
   end
-
-  def handle_call({:update, data}, _from, {links, store, opts}) do
-    {links, store} = update_single(store, links, data, opts[:precision])
-    {:reply, data, {links, store, opts}}
-  end
-
-  #  state = {Map.put(links, link, key), Map.put(store, key, data), opts}
-  #  {:reply, data, state}
-  #end
 
   # Get the state
   def handle_call(:state, _from, state) do
@@ -71,11 +59,6 @@ defmodule Geocoder.Store do
   def handle_cast({:link, from, data}, {links, store, opts}) when is_list(data) do
     map = data |> Enum.reduce(links, &link_single(&2, from, &1, opts[:precision]))
     {:noreply, {map, store, opts}}
-  end
-
-  # Link a query to a cached value
-  def handle_cast({:link, from, data}, {links, store, opts}) do
-    {:noreply, {link_single(links, from, data, opts[:precision]), store, opts}}
   end
 
   ##############################################################################
@@ -99,12 +82,17 @@ defmodule Geocoder.Store do
 
   ##############################################################################
 
-  defp link_single(map, from, to, precision) do
-    %Geocoder.Coords{lat: lat, lon: lon} = to |> Geocoder.Data.latlng
-    Map.put_new(map, encode(from, precision), encode({lat, lon}, precision))
+  defp link_single(links, from, data, precision) do
+    %Geocoder.Coords{lat: lat, lon: lon} = data |> Geocoder.Data.latlng
+    {k, v} = {encode(from, precision), encode({lat, lon}, precision)}
+    {_, map} = Map.get_and_update(links, k, fn current_value ->
+      neu = if is_list(current_value), do: current_value ++ [v], else: [v]
+      {current_value, neu}
+    end)
+    map
   end
 
-  defp update_single(store, links, data, precision) do
+  defp update_single({store, links}, data, precision) do
     %{lat: lat, lon: lon} = data |> Geocoder.Data.latlng
     location =
       data |> Geocoder.Data.location
@@ -115,6 +103,14 @@ defmodule Geocoder.Store do
     key = encode({lat, lon}, precision)
     link = encode(location, precision)
 
-    {Map.put_new(links, link, key), Map.put_new(store, key, data)}
+    {_, l} = Map.get_and_update(links, link, fn current_value ->
+      neu = if is_list(current_value), do: current_value ++ [key], else: [key]
+      {current_value, neu}
+    end)
+    {_, s} = Map.get_and_update(store, key, fn current_value ->
+      neu = if is_list(current_value), do: current_value ++ [data], else: [data]
+      {current_value, neu}
+    end)
+    {l, s}
   end
 end

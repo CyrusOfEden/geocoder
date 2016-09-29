@@ -13,17 +13,12 @@ defmodule GeocoderTest do
 
   test "A list of results for an address in Belgium" do
     {:ok, coords} = Geocoder.call_list("Dikkelindestraat 46, 9032 Wondelgem, Belgium")
-    assert is_list(coords)
-    assert [head|_] = coords
-    assert_belgium(head)
+    assert_belgium_list(coords, true)
   end
 
   test "A list of results for coordinates" do
     {:ok, coords} = Geocoder.call_list({51.0775264, 3.7073382})
-    assert is_list(coords)
-    assert [head|tail] = coords
-    assert is_list(tail)
-    assert_belgium(head)
+    assert_belgium_list(coords, false)
   end
 
   test "Explicit Geocode.GoogleMaps data: latlng" do
@@ -55,10 +50,10 @@ defmodule GeocoderTest do
     bounds = coords |> Geocoder.Data.bounds
 
     # Bounds are not always returned
-    assert (nil == bounds.bottom) || (bounds.bottom |> Float.round(2) == 51.08)
-    assert (nil == bounds.left) || (bounds.left |> Float.round(2) == 3.71)
-    assert (nil == bounds.right) || (bounds.right |> Float.round(2) == 3.71)
-    assert (nil == bounds.top) || (bounds.top |> Float.round(2) == 51.08)
+    assert (nil == bounds.bottom) || (bounds.bottom |> Float.round == 51)
+    assert (nil == bounds.left) || (bounds.left |> Float.round(1) == 3.7)
+    assert (nil == bounds.right) || (bounds.right |> Float.round(1) == 3.7)
+    assert (nil == bounds.top) || (bounds.top |> Float.round == 51)
 
     location = coords |> Geocoder.Data.location
     assert nil == location.street_number || location.street_number == "46"
@@ -75,8 +70,15 @@ defmodule GeocoderTest do
     assert location.formatted_address |> String.match?(~r/Belgium/)
 
     %Geocoder.Coords{lat: lat, lon: lon} = coords |> Geocoder.Data.latlng
-    assert lat |> Float.round(2) == 51.08
-    assert lon |> Float.round(2) == 3.71
+    assert lat |> Float.round == 51
+    assert lon |> Float.round(1) == 3.7
+  end
+
+  defp assert_belgium_list(result, single) do
+    assert is_list(result)
+    assert [head|tail] = result
+    assert (if single, do: tail |> Enum.empty?, else: not(tail |> Enum.empty?))
+    assert_belgium(head)
   end
 
 end
