@@ -22,12 +22,12 @@ defprotocol Geocoder.Data do
 
     @tags [direct]
   """
-  @doc """
-    The component filters, separated by a pipe (|).
-    Each component filter consists of a component:value pair and will fully restrict
-    the results from the geocoder.
-  """
   def components(data)
+
+  @doc """
+    Returns a standartized location as a struct `%{Geocoder.Location}`.
+  """
+  def location(data)
 
   @doc """
     The latitude and longitude values specifying the location
@@ -41,17 +41,6 @@ defprotocol Geocoder.Data do
     The place ID of the place for which you wish to obtain the human-readable address.
 
     @tags [reverse]
-  """
-  @doc """
-    The place ID is a unique identifier that can be used with other Google APIs.
-    For example, you can use the placeID returned by the
-    [Google Maps Roads API](https://developers.google.com/maps/documentation/roads/snap)
-    to get the address for a snapped point.
-
-    For more information about place IDs, see the
-    [place ID overview](https://developers.google.com/places/place-id).
-    The place ID may only be specified if the request includes
-    an API key or a Google Maps APIs Premium Plan client ID.
   """
   def place_id(data)
 
@@ -69,22 +58,6 @@ defprotocol Geocoder.Data do
 
     @tags [reverse]
   """
-
-  @doc """
-    Examples of address types: `country`, `street_address`, `postal_code`.
-    For a full list of allowable values,
-    see the [address types](https://developers.google.com/maps/documentation/geocoding/intro#Types).
-
-    Specifying a type will restrict the results to this type.
-    If multiple types are specified, the API will return all addresses
-    that match any of the types.
-
-    _Note:_ This parameter is available only for requests that include an API key or a client ID.
-
-    If both `result_type` and `location_type` restrictions are present
-    then the API will return only those results that matches
-    both the `result_type` and the `location_type` restrictions.
-  """
   def result_type(data)
 
   @doc """
@@ -94,6 +67,30 @@ defprotocol Geocoder.Data do
 
   @doc """
     Specifies the endpoint for the given implementation.
+
+    ---
+
+    - **address**: simple string, designationg an address, or it’s part.
+    - **components**: the component filters, separated by a pipe (|).
+    Each component filter consists of a component:value pair and will fully restrict
+    the results from the geocoder.
+    - **place_id**: The place ID is a unique identifier that can be used with other Google APIs.
+    For example, you can use the placeID returned by the
+    [Google Maps Roads API](https://developers.google.com/maps/documentation/roads/snap)
+    to get the address for a snapped point. For more information about place IDs, see the
+    [place ID overview](https://developers.google.com/places/place-id).
+    The place ID may only be specified if the request includes
+    an API key or a Google Maps APIs Premium Plan client ID.
+    - **result_type**: examples of address types: `country`, `street_address`, `postal_code`.
+    For a full list of allowable values, see
+    the [address types](https://developers.google.com/maps/documentation/geocoding/intro#Types).
+    Specifying a type will restrict the results to this type.
+    If multiple types are specified, the API will return all addresses
+    that match any of the types. _**Note:** this parameter is available only for
+    requests that include an API key or a client ID._
+    If both `result_type` and `location_type` restrictions are present
+    then the API will return only those results that matches
+    both the `result_type` and the `location_type` restrictions.
   """
   def endpoint(data, type)
 end

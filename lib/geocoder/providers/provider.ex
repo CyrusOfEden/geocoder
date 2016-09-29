@@ -1,5 +1,3 @@
-require IEx
-
 defmodule Geocoder.Providers.Provider do
   use HTTPoison.Base
 
@@ -8,7 +6,7 @@ defmodule Geocoder.Providers.Provider do
   def go!(data, params \\ %Geocoder.QueryParams{}, provider \\ Geocoder.Worker.provider?)
 
   def go!(data, params, provider) when is_list(params) do #
-    go!(data, %Geocoder.QueryParams{}, provider)
+    go!(data, Geocoder.QueryParams.new(params), provider)
   end
 
   def go!(data, %Geocoder.QueryParams{} = params, provider) do # Geocoder.Worker.provider?
@@ -22,11 +20,7 @@ defmodule Geocoder.Providers.Provider do
 
     case get(url, [], params) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        result = body
-                 |> Poison.decode!
-                 |> Map.get("results")
-                 |> List.first
-        {:ok, apply(provider, :new, [result])}
+        {:ok, apply(provider, :new, [body |> Poison.decode!])}
       {:ok, %HTTPoison.Response{status_code: 404}} ->
         {:error, :not_found}
       {:error, %HTTPoison.Error{reason: reason}} ->

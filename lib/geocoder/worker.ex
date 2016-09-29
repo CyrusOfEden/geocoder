@@ -1,4 +1,3 @@
-require IEx
 defmodule Geocoder.Worker do
   use GenServer
   use Towel
@@ -103,7 +102,6 @@ defmodule Geocoder.Worker do
   end
   defp run(function, conf, q, false) do
     # apply(conf[:provider], function, [q])
-    IO.inspect conf[:provider]
     Geocoder.Providers.Provider.go!(q, %Geocoder.QueryParams{}, conf[:provider])
     # |> tap(&conf[:store].update/1)
     # |> tap(&conf[:store].link(q, &1))

@@ -1,9 +1,4 @@
-require IEx
-
 defmodule Geocoder.Providers.GoogleMaps do
-  use HTTPoison.Base
-  use Towel
-
   @doc """
       {
          "results" : [
@@ -103,6 +98,14 @@ defmodule Geocoder.Providers.GoogleMaps do
   end
 
   def new(data) when is_map(data) do
+    case data[:results] || data["results"] do
+      nil      -> one_from_map(data)
+      [one]    -> one_from_map(one)
+      [_ | _]  -> data[:results] |> Enum.map(&one_from_map(&1))
+    end
+  end
+
+  defp one_from_map(data) when is_map(data) do
     %Geocoder.Providers.GoogleMaps{} |> Map.merge(data |> atomize_keys)
   end
 
@@ -110,28 +113,44 @@ defmodule Geocoder.Providers.GoogleMaps do
 
   defimpl Geocoder.Data, for: Geocoder.Providers.GoogleMaps do
     def address(data) do
-      case data.formatted_address do
-        "" -> nil
-        result -> result
-      end
+      data.formatted_address
     end
 
     # TODO: should we make use of "political" type?
     def components(data) do
-      result = data.address_components |> Enum.reduce(%{},
-        fn %{long_name: long_name, short_name: _short_name, types: [type | _]}, acc ->
-          acc |> Map.put(type |> String.to_atom, long_name) # TODO: should we make use of "short_name"?
-        end)
+      data.address_components
+        |> Enum.reduce(%{}, fn %{long_name: long_name, short_name: short_name, types: [type | _]}, acc ->
+                              acc = if short_name == long_name, do: acc, else: Map.put(acc, String.to_atom(type <> "_code"), short_name)
+                              acc |> Map.put(String.to_atom(type), long_name)
+                            end)
+    end
 
-      if result |> Enum.empty?, do: nil, else: result
+    # %{administrative_area_level_1: "Vlaanderen",
+    #   administrative_area_level_2: "Oost-Vlaanderen",
+    #   country: "Belgium",
+    #   locality: "Gent",
+    #   postal_code: "9032",
+    #   route: "Dikkelindestraat",
+    #   street_number: "46"}
+    def location(data) do
+      comps = data |> components
+      %Geocoder.Location{
+        city: comps[:locality],
+        state: comps[:county],
+        country: comps[:country] || comps[:administrative_area_level_2] || comps[:administrative_area_level_1],
+        postal_code: comps[:postal_code],
+        street: comps[:route],
+        street_number: comps[:street_number],
+        country_code: comps[:country_code],
+        formatted_address: address(data),
+      }
     end
 
     def latlng(data) do
       case data.geometry.location do
-        %{lat: nil, lng: _} -> nil
-        %{lat: nil, lon: _} -> nil
-        %{lat: _, lng: nil} -> nil
-        %{lat: _, lon: nil} -> nil
+        %{lat: nil} -> nil
+        %{lon: nil} -> nil
+        %{lng: nil} -> nil
         %{lat: lat, lng: lng} -> %Geocoder.Coords{lat: lat, lon: lng}
         %{lat: lat, lon: lon} -> %Geocoder.Coords{lat: lat, lon: lon}
         result -> result
@@ -139,10 +158,7 @@ defmodule Geocoder.Providers.GoogleMaps do
     end
 
     def place_id(data) do
-      case data.place_id do
-        "" -> nil
-        result -> result
-      end
+      data.place_id
     end
 
     def bounds(data) do
@@ -156,26 +172,25 @@ defmodule Geocoder.Providers.GoogleMaps do
     end
 
     def result_type(data) do
-      case data.types do
-        [] -> nil
-        result -> result
-      end
+      data.types
     end
 
     def query(data) do
-      acc = %{}
-
-      unless (d = address(data)) == nil, do: acc = acc |> put_in([:address], d)
-      unless (d = components(data)) == nil do
-        d = d |> Enum.map(fn {k, v} -> "#{k}:#{v}" end) |> Enum.join("|")
-        acc = acc |> put_in([:components], d)
-      end
-      unless (d = latlng(data)) == nil, do: acc = acc |> put_in([:latlng], "#{d}")
-      unless (d = place_id(data)) == nil, do: acc = acc |> put_in([:place_id], d)
-      unless (d = bounds(data)) == nil, do: acc = acc |> put_in([:bounds], "#{d}")
-      if is_list(d = result_type(data)), do: acc = acc |> put_in([:address], d |> Enum.join("|"))
-
-      acc |> Map.to_list
+      %{
+        address: address(data),
+        components: components(data) |> Enum.map(fn {k, v} -> "#{k}:#{v}" end) |> Enum.join("|"),
+        latlng: latlng(data),
+        place_id: place_id(data),
+        bounds: bounds(data),
+        result_type: result_type(data) |> Enum.join("|")
+      } |> Enum.reject(fn {_, v} ->
+             case v do
+               nil -> true
+               []  -> true
+               ""  -> true
+               _   -> false
+             end
+           end)
     end
 
     def endpoint(_, _) do

@@ -5,6 +5,17 @@ defmodule Geocoder.QueryParams do
             region: nil,
             location_type: nil
 
+  def new(query_params) when is_map(query_params) do
+    new(query_params |> Map.to_list)
+  end
+
+  def new(query_params) when is_list(query_params) do
+    %Geocoder.QueryParams{}
+      |> Map.merge(query_params
+                    |> Keyword.take(~W{region location_type key language}a)
+                    |> Enum.into(%{}))
+  end
+
   def to_map(query_params) do
     query_params
       |> Map.delete(:__struct__)

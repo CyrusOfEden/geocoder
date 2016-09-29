@@ -1,4 +1,3 @@
-require IEx
 defmodule GeocoderTest do
   use ExUnit.Case
 
@@ -26,8 +25,9 @@ defmodule GeocoderTest do
   end
 
   defp assert_belgium(coords) do
-    IEx.pry
-    %Geocoder.Coords{bounds: bounds, location: location, lat: lat, lon: lon} = coords
+    IO.inspect(coords |> Geocoder.Data.components)
+
+    bounds = coords |> Geocoder.Data.bounds
 
     # Bounds are not always returned
     assert (nil == bounds.bottom) || (bounds.bottom |> Float.round(2) == 51.08)
@@ -35,6 +35,7 @@ defmodule GeocoderTest do
     assert (nil == bounds.right) || (bounds.right |> Float.round(2) == 3.71)
     assert (nil == bounds.top) || (bounds.top |> Float.round(2) == 51.08)
 
+    location = coords |> Geocoder.Data.location
     assert nil == location.street_number || location.street_number == "46"
     assert location.street == "Dikkelindestraat"
     assert location.city == "Gent"
@@ -47,6 +48,8 @@ defmodule GeocoderTest do
     assert location.formatted_address |> String.match?(~r/Gent/)
     assert location.formatted_address |> String.match?(~r/9032/)
     assert location.formatted_address |> String.match?(~r/Belgium/)
+
+    %Geocoder.Coords{lat: lat, lon: lon} = coords |> Geocoder.Data.latlng
     assert lat |> Float.round(2) == 51.08
     assert lon |> Float.round(2) == 3.71
   end
