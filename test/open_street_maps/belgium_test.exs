@@ -1,43 +1,44 @@
-defmodule Geocoder.GoogleMaps.Test do
+defmodule Geocoder.OpenStreetMaps.Test do
   use ExUnit.Case
 
   test "An address in Belgium" do
-    {:ok, coords} = Geocoder.call("Dikkelindestraat 46, 9032 Wondelgem, Belgium")
+    {:ok, coords} = Geocoder.call("Dikkelindestraat 46, 9032 Wondelgem, Belgium", provider: Geocoder.OpenStreetMaps)
     assert_belgium coords
   end
 
   test "Reverse geocode" do
-    {:ok, coords} = Geocoder.call({51.0775264, 3.7073382})
+    {:ok, coords} = Geocoder.call({51.0775264, 3.7073382}, provider: Geocoder.OpenStreetMaps)
     assert_belgium coords
   end
 
   test "A list of results for an address in Belgium" do
-    {:ok, coords} = Geocoder.call_list("Dikkelindestraat 46, 9032 Wondelgem, Belgium")
+    {:ok, coords} = Geocoder.call_list("Dikkelindestraat 46, 9032 Wondelgem, Belgium", provider: Geocoder.OpenStreetMaps)
     assert_belgium_list(coords, true)
   end
 
   test "A list of results for coordinates" do
-    {:ok, coords} = Geocoder.call_list({51.0775264, 3.7073382})
+    {:ok, coords} = Geocoder.call_list({51.0775264, 3.7073382}, provider: Geocoder.OpenStreetMaps)
     assert_belgium_list(coords, false)
   end
 
-  test "Explicit Geocode.GoogleMaps data: latlng" do
-    {:ok, coords} = Geocoder.call(Geocoder.GoogleMaps.new({51.0775264, 3.7073382}))
+  test "Explicit Geocode.OpenStreetMaps data: latlng" do
+    {:ok, coords} = Geocoder.call(Geocoder.OpenStreetMaps.new({51.0775264, 3.7073382}), provider: Geocoder.OpenStreetMaps)
     assert_belgium(coords)
   end
 
-  test "Explicit Geocode.GoogleMaps data: address" do
-    {:ok, coords} = Geocoder.call(Geocoder.GoogleMaps.new("Dikkelindestraat 46, 9032 Wondelgem, Belgium"))
+  test "Explicit Geocode.OpenStreetMaps data: address" do
+    {:ok, coords} = Geocoder.call(Geocoder.OpenStreetMaps.new("Dikkelindestraat 46, 9032 Wondelgem, Belgium"), provider: Geocoder.OpenStreetMaps)
     assert_belgium(coords)
   end
 
-  test "Explicit Geocode.GoogleMaps list: latlng" do
-    {:ok, coords} = Geocoder.call_list(Geocoder.GoogleMaps.new({51.0775264, 3.7073382}))
-    assert_belgium_list(coords, true)
+  test "Explicit Geocode.OpenStreetMaps list: latlng" do
+    {:ok, coords} = Geocoder.call_list(Geocoder.OpenStreetMaps.new({51.0775264, 3.7073382}), provider: Geocoder.OpenStreetMaps)
+    assert_belgium_list(coords, false)
   end
 
-  test "Explicit Geocode.GoogleMaps list: address" do
-    {:ok, coords} = Geocoder.call_list(Geocoder.GoogleMaps.new("Dikkelindestraat 46, 9032 Wondelgem, Belgium"))
+  @tag :pending
+  test "Explicit Geocode.OpenStreetMaps list: address" do
+    {:ok, coords} = Geocoder.call_list(Geocoder.OpenStreetMaps.new("Dikkelindestraat 46, 9032 Wondelgem, Belgium"), provider: Geocoder.OpenStreetMaps)
     assert_belgium_list(coords, false)
   end
 
@@ -74,7 +75,7 @@ defmodule Geocoder.GoogleMaps.Test do
   defp assert_belgium_list(result, _single) do
     assert is_list(result)
     assert [head|_tail] = result
-    # unless single, do: assert not(tail |> Enum.empty?)
+    # assert (if single, do: tail |> Enum.empty?, else: not(tail |> Enum.empty?))
     assert_belgium(head)
   end
 

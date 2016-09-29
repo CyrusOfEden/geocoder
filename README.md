@@ -13,7 +13,7 @@ Keep calm and add Geocoder to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
-  [{:geocoder, "~> 0.4"}]
+  [{:geocoder, "~> 0.7"}]
 end
 ```
 
@@ -50,14 +50,30 @@ config :geocoder, Geocoder.Worker, [
 ]
 ```
 
+Set default provider:
+
+```elixir
+config :geocoder, :worker, [
+  provider: Geocoder.GoogleMaps # or OpenStreetMaps
+]
+```
+
 Let's rumble!
 
 Usage
 -----
 
 ```elixir
+# query data
 Geocoder.call("Toronto, ON")
 Geocoder.call({43.653226, -79.383184})
+Geocoder.call({43.653226, -79.383184}, provider: Geocoder.OpenStreetMaps)
+
+# query and set provider
+{:ok, provider} = Geocoder.Worker.provider!(Geocoder.Providers.OpenStreetMaps)
+# assert provider == Geocoder.GoogleMaps # returned the previous value
+{:ok, provider} = Geocoder.Worker.provider?
+# assert provider == Geocoder.Providers.OpenStreetMaps
 ```
 
 You can pass options to the function that will be passed to the geocoder provider, for example:
@@ -66,6 +82,18 @@ You can pass options to the function that will be passed to the geocoder provide
 Geocoder.call(address: "Toronto, ON", language: "es", key: "...", ...)
 ```
 
-See [here](https://developers.google.com/maps/documentation/geocoding/intro#geocoding) and [here](https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding) for a list of supported parameters for the default geocoder provider (`Geocoder.Provider.GoogleMaps`).
+See [here](https://developers.google.com/maps/documentation/geocoding/intro#geocoding) and [here](https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding) for a list of supported parameters for the default geocoder provider (`Geocoder.GoogleMaps`). Basically this options are fine for _all_ available
+providers, because they are used through the protocol they implement.
 
 And you're done! How simple was that?
+
+
+Changelog
+---------
+
+- **0.7.0**
+  - multiple providers are supported through `protocol`;
+  - the provider might be explicitly specified in call to `Geocoder.call`;
+  - the provider might be changed globally through call to `Geocoder.Worker.provider!`;
+  - the data returned by `Geocoder.call` is the structure, that implements a
+    standard protocol `Geocoder.Data` and stores all the possible values.

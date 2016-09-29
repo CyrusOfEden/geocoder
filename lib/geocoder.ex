@@ -37,7 +37,7 @@ defmodule Geocoder do
   def call(q, opts \\ [])
   def call(q, opts) when is_binary(q), do: Worker.geocode(opts ++ [address: q])
   def call({lat,lon}, opts), do: Worker.reverse_geocode(opts ++ [latlng: {lat,lon}])
-  def call(%{lat: lat, lon: lon}, opts), do: call({lat, lon}, opts)
+  def call(%{lat: lat, lon: lon}, opts) when lat != nil and lon != nil, do: call({lat, lon}, opts)
   def call(%Geocoder.Coords{lat: lat, lon: lon}, opts), do: call({lat, lon}, opts)
   def call(q, opts) when is_map(q), do: call(q |> Geocoder.Data.latlng || q |> Geocoder.Data.address, opts)
 

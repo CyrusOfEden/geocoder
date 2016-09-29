@@ -5,10 +5,8 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Geocoder.GoogleMaps – geocoder v0.6.2</title>
+    <title>Geocoder.Provider – geocoder v0.7.0</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
-    
-      <link rel="canonical" href="https://hexdocs.pm/geocoder/Geocoder.GoogleMaps.html" />
     
     <script src="dist/sidebar_items.js"></script>
   </head>
@@ -28,7 +26,7 @@
         geocoder
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.6.2
+        v0.7.0
       </h2>
     </div>
     
@@ -49,6 +47,8 @@
     
 
     
+      <li><a id="protocols-list" href="#full-list">Protocols</a></li>
+    
   </ul>
 
   <ul id="full-list" class="sidebar-fullList"></ul>
@@ -61,12 +61,26 @@
 
 
       <h1>
-        <small class="visible-xs">geocoder v0.6.2</small>
-        Geocoder.GoogleMaps
+        <small class="visible-xs">geocoder v0.7.0</small>
+        Geocoder.Provider
         
         
       </h1>
 
+      
+        <section id="moduledoc" class="docstring">
+          <p>  <a href="Geocoder.html"><code class="inline">Geocoder</code></a> uses a concept of providers. Provider should implement
+  <a href="Geocoder.Data.html"><code class="inline">Geocoder.Data</code></a> protocol, what allows different providers to be operated
+  in the unified manner.</p>
+<p>  Currently there are two providers available:</p>
+<ul>
+<li>Geocoder.GoogleMaps
+</li>
+<li>Geocoder.OpenStreetMaps
+</li>
+</ul>
+
+        </section>
       
 
       
@@ -105,6 +119,12 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
+    <a href="#atomize_keys/1">atomize_keys(map)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
     <a href="#delete/3">delete(url, headers \\ [], options \\ [])</a>
   </div>
   
@@ -124,18 +144,6 @@ failure</p>
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#geocode/1">geocode(opts)</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#geocode_list/1">geocode_list(opts)</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
     <a href="#get/3">get(url, headers \\ [], options \\ [])</a>
   </div>
   
@@ -151,6 +159,12 @@ failure</p>
     <div class="summary-synopsis"><p>Issues a GET request to the given url, raising an exception in case of
 failure</p>
 </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#go!/3">go!(data, params \\ %Geocoder.QueryParams{}, provider \\ Geocoder.Worker.provider?())</a>
+  </div>
   
 </div>
 <div class="summary-row">
@@ -269,18 +283,6 @@ exception in case of failure</p>
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#reverse_geocode/1">reverse_geocode(opts)</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#reverse_geocode_list/1">reverse_geocode_list(opts)</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
     <a href="#start/0">start()</a>
   </div>
   
@@ -334,7 +336,21 @@ exception in case of failure</p>
             </a>
             Functions
           </h1>
-          <div class="detail" id="delete/3">
+          <div class="detail" id="atomize_keys/1">
+  <div class="detail-header">
+    <a href="#atomize_keys/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">atomize_keys(map)</span>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="delete/3">
   <div class="detail-header">
     <a href="#delete/3" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
@@ -390,34 +406,6 @@ failure.</p>
 <p>If the request does not fail, the response is returned.</p>
 <p>See <a href="#request!/5"><code class="inline">request!/5</code></a> for more detailed information.</p>
 
-  </section>
-</div>
-<div class="detail" id="geocode/1">
-  <div class="detail-header">
-    <a href="#geocode/1" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">geocode(opts)</span>
-    
-    
-  </div>
-  
-  <section class="docstring">
-    
-  </section>
-</div>
-<div class="detail" id="geocode_list/1">
-  <div class="detail-header">
-    <a href="#geocode_list/1" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">geocode_list(opts)</span>
-    
-    
-  </div>
-  
-  <section class="docstring">
-    
   </section>
 </div>
 <div class="detail" id="get/3">
@@ -476,6 +464,20 @@ failure.</p>
 <p>If the request does not fail, the response is returned.</p>
 <p>See <a href="#request!/5"><code class="inline">request!/5</code></a> for more detailed information.</p>
 
+  </section>
+</div>
+<div class="detail" id="go!/3">
+  <div class="detail-header">
+    <a href="#go!/3" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">go!(data, params \\ %Geocoder.QueryParams{}, provider \\ Geocoder.Worker.provider?())</span>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    
   </section>
 </div>
 <div class="detail" id="head/3">
@@ -871,34 +873,6 @@ exception in case of failure.</p>
 response in case of a successful request, raising an exception in case the
 request fails.</p>
 
-  </section>
-</div>
-<div class="detail" id="reverse_geocode/1">
-  <div class="detail-header">
-    <a href="#reverse_geocode/1" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">reverse_geocode(opts)</span>
-    
-    
-  </div>
-  
-  <section class="docstring">
-    
-  </section>
-</div>
-<div class="detail" id="reverse_geocode_list/1">
-  <div class="detail-header">
-    <a href="#reverse_geocode_list/1" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">reverse_geocode_list(opts)</span>
-    
-    
-  </div>
-  
-  <section class="docstring">
-    
   </section>
 </div>
 <div class="detail" id="start/0">

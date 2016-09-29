@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.13.0">
-    <title>Geocoder.Worker – geocoder v0.7.0</title>
+    <title>Geocoder.QueryParams – geocoder v0.7.0</title>
     <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -62,7 +62,7 @@
 
       <h1>
         <small class="visible-xs">geocoder v0.7.0</small>
-        Geocoder.Worker
+        Geocoder.QueryParams
         
         
       </h1>
@@ -86,49 +86,19 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#geocode/2">geocode(q, opts \\ [])</a>
+    <a href="#new/1">new(query_params)</a>
   </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#geocode_list/2">geocode_list(q, opts \\ [])</a>
+    <a href="#to_keyword/1">to_keyword(query_params)</a>
   </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#provider!/1">provider!(provider)</a>
-  </div>
-  
-    <div class="summary-synopsis"><p>Changes the default provider on the fly</p>
-</div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#provider?/0">provider?()</a>
-  </div>
-  
-    <div class="summary-synopsis"><p>Returns current provider</p>
-</div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#reverse_geocode/2">reverse_geocode(q, opts \\ [])</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#reverse_geocode_list/2">reverse_geocode_list(q, opts \\ [])</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#start_link/1">start_link(conf)</a>
+    <a href="#to_map/1">to_map(query_params)</a>
   </div>
   
 </div>
@@ -153,12 +123,12 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="geocode/2">
+          <div class="detail" id="new/1">
   <div class="detail-header">
-    <a href="#geocode/2" class="detail-link" title="Link to this function">
+    <a href="#new/1" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">geocode(q, opts \\ [])</span>
+    <span class="signature">new(query_params)</span>
     
     
   </div>
@@ -167,12 +137,12 @@
     
   </section>
 </div>
-<div class="detail" id="geocode_list/2">
+<div class="detail" id="to_keyword/1">
   <div class="detail-header">
-    <a href="#geocode_list/2" class="detail-link" title="Link to this function">
+    <a href="#to_keyword/1" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">geocode_list(q, opts \\ [])</span>
+    <span class="signature">to_keyword(query_params)</span>
     
     
   </div>
@@ -181,78 +151,12 @@
     
   </section>
 </div>
-<div class="detail" id="provider!/1">
+<div class="detail" id="to_map/1">
   <div class="detail-header">
-    <a href="#provider!/1" class="detail-link" title="Link to this function">
+    <a href="#to_map/1" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">provider!(provider)</span>
-    
-    
-  </div>
-  
-  <section class="docstring">
-    <p>  Changes the default provider on the fly.</p>
-<p>  Accepts both the module, representing provider or an instance of struct.</p>
-<p>  Currently supported protocols:</p>
-<ul>
-<li><a href="Geocoder.GoogleMaps.html"><code class="inline">Geocoder.GoogleMaps</code></a>
-</li>
-<li><code class="inline">Geocoder.Providers.OpenStreetMaps</code>
-</li>
-</ul>
-
-  </section>
-</div>
-<div class="detail" id="provider?/0">
-  <div class="detail-header">
-    <a href="#provider?/0" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">provider?()</span>
-    
-    
-  </div>
-  
-  <section class="docstring">
-    <p>  Returns current provider.</p>
-
-  </section>
-</div>
-<div class="detail" id="reverse_geocode/2">
-  <div class="detail-header">
-    <a href="#reverse_geocode/2" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">reverse_geocode(q, opts \\ [])</span>
-    
-    
-  </div>
-  
-  <section class="docstring">
-    
-  </section>
-</div>
-<div class="detail" id="reverse_geocode_list/2">
-  <div class="detail-header">
-    <a href="#reverse_geocode_list/2" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">reverse_geocode_list(q, opts \\ [])</span>
-    
-    
-  </div>
-  
-  <section class="docstring">
-    
-  </section>
-</div>
-<div class="detail" id="start_link/1">
-  <div class="detail-header">
-    <a href="#start_link/1" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">start_link(conf)</span>
+    <span class="signature">to_map(query_params)</span>
     
     
   </div>

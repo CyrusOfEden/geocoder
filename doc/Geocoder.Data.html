@@ -1,0 +1,439 @@
+    <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.13.0">
+    <title>Geocoder.Data – geocoder v0.7.0</title>
+    <link rel="stylesheet" href="dist/app-9c1e3d5aa2.css" />
+    
+    <script src="dist/sidebar_items.js"></script>
+  </head>
+  <body data-type="protocols">
+    <script>if(localStorage.getItem('night-mode')) document.body.className += ' night-mode';</script>
+
+    <div class="main">
+<button class="sidebar-toggle">
+  <i class="icon-menu"></i>
+</button>
+<section class="sidebar">
+
+  
+  <a href="api-reference.html" class="sidebar-projectLink">
+    <div class="sidebar-projectDetails">
+      <h1 class="sidebar-projectName">
+        geocoder
+      </h1>
+      <h2 class="sidebar-projectVersion">
+        v0.7.0
+      </h2>
+    </div>
+    
+  </a>
+
+  <div class="sidebar-search">
+    <i class="icon-search"></i>
+    <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" />
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+    
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+    
+
+    
+
+    
+      <li><a id="protocols-list" href="#full-list">Protocols</a></li>
+    
+  </ul>
+
+  <ul id="full-list" class="sidebar-fullList"></ul>
+  <div class="sidebar-noResults"></div>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="visible-xs">geocoder v0.7.0</small>
+        Geocoder.Data
+        
+          <small>protocol</small>
+        
+        
+      </h1>
+
+      
+
+      
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <i class="icon-link"></i>
+            </a>
+            Summary
+          </h1>
+          
+  <div class="summary-types summary">
+    <h2>
+      <a href="#types">Types</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:t/0">t()</a>
+  </div>
+  
+</div>
+
+  </div>
+
+
+          
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#address/1">address(data)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>The street address that you want to geocode, in the format used by
+  the national postal service of the country concerned.
+  Additional address elements such as business names and unit,
+  suite or floor numbers should be avoided.
+  Please refer to <a href="https://developers.google.com/maps/faq#geocoder_queryformat">the FAQ</a>
+  for additional guidance</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#bounds/1">bounds(data)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>The bounding box of the viewport within which to bias geocode results more prominently.
+  This parameter will only influence, not fully restrict, results from the geocoder.
+  (For more information see <a href="https://developers.google.com/maps/documentation/geocoding/intro#Viewports">Viewport Biasing</a>.)</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#components/1">components(data)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>A component filter for which you wish to obtain a geocode.
+  See <a href="https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering">Component Filtering</a>
+  for more information</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#endpoint/2">endpoint(data, type)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Specifies the endpoint for the given implementation</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#latlng/1">latlng(data)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>The latitude and longitude values specifying the location
+  for which you wish to obtain the closest, human-readable address</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#location/1">location(data)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Returns a standartized location as a struct <code class="inline">%{Geocoder.Location}</code></p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#place_id/1">place_id(data)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>The place ID of the place for which you wish to obtain the human-readable address</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#query/2">query(data, type)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Builds a query parameters for the implementation</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#result_type/1">result_type(data)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>One or more address types</p>
+</div>
+  
+</div>
+
+  </div>
+
+
+          
+
+          
+
+        </section>
+      
+
+      
+        <section id="types" class="types details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#types">
+              <i class="icon-link"></i>
+            </a>
+            Types
+          </h1>
+          <div class="types-list">
+            <div id="t:t/0" class="type-detail">
+  <pre><code class="elixir"><a href="#t:t/0">t</a> :: term</code></pre>
+  
+</div>
+
+          </div>
+        </section>
+      
+
+      
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <i class="icon-link"></i>
+            </a>
+            Functions
+          </h1>
+          <div class="detail" id="address/1">
+  <div class="detail-header">
+    <a href="#address/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">address(data)</span>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    <p>  The street address that you want to geocode, in the format used by
+  the national postal service of the country concerned.
+  Additional address elements such as business names and unit,
+  suite or floor numbers should be avoided.
+  Please refer to <a href="https://developers.google.com/maps/faq#geocoder_queryformat">the FAQ</a>
+  for additional guidance.</p>
+<p>  @tags [direct]
+  @see <code class="inline">components</code></p>
+
+  </section>
+</div>
+<div class="detail" id="bounds/1">
+  <div class="detail-header">
+    <a href="#bounds/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">bounds(data)</span>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    <p>  The bounding box of the viewport within which to bias geocode results more prominently.
+  This parameter will only influence, not fully restrict, results from the geocoder.
+  (For more information see <a href="https://developers.google.com/maps/documentation/geocoding/intro#Viewports">Viewport Biasing</a>.)</p>
+<p>  @tags [direct]</p>
+
+  </section>
+</div>
+<div class="detail" id="components/1">
+  <div class="detail-header">
+    <a href="#components/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">components(data)</span>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    <p>  A component filter for which you wish to obtain a geocode.
+  See <a href="https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering">Component Filtering</a>
+  for more information.</p>
+<p>  The components filter will also be accepted as an optional parameter
+  if an address is provided.</p>
+<p>  @tags [direct]</p>
+
+  </section>
+</div>
+<div class="detail" id="endpoint/2">
+  <div class="detail-header">
+    <a href="#endpoint/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">endpoint(data, type)</span>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    <p>  Specifies the endpoint for the given implementation.</p>
+<hr class="thin"/>
+<ul>
+<li><strong>address</strong>: simple string, designationg an address, or it’s part.
+</li>
+<li><strong>components</strong>: the component filters, separated by a pipe (|).
+  Each component filter consists of a component:value pair and will fully restrict
+  the results from the geocoder.
+</li>
+<li><strong>place_id</strong>: The place ID is a unique identifier that can be used with other Google APIs.
+  For example, you can use the placeID returned by the
+  <a href="https://developers.google.com/maps/documentation/roads/snap">Google Maps Roads API</a>
+  to get the address for a snapped point. For more information about place IDs, see the
+  <a href="https://developers.google.com/places/place-id">place ID overview</a>.
+  The place ID may only be specified if the request includes
+  an API key or a Google Maps APIs Premium Plan client ID.
+</li>
+<li><strong>result_type</strong>: examples of address types: <code class="inline">country</code>, <code class="inline">street_address</code>, <code class="inline">postal_code</code>.
+  For a full list of allowable values, see
+  the <a href="https://developers.google.com/maps/documentation/geocoding/intro#Types">address types</a>.
+  Specifying a type will restrict the results to this type.
+  If multiple types are specified, the API will return all addresses
+  that match any of the types. <em><strong>Note:</strong> this parameter is available only for
+  requests that include an API key or a client ID.</em>
+  If both <code class="inline">result_type</code> and <code class="inline">location_type</code> restrictions are present
+  then the API will return only those results that matches
+  both the <code class="inline">result_type</code> and the <code class="inline">location_type</code> restrictions.
+</li>
+</ul>
+
+  </section>
+</div>
+<div class="detail" id="latlng/1">
+  <div class="detail-header">
+    <a href="#latlng/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">latlng(data)</span>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    <p>  The latitude and longitude values specifying the location
+  for which you wish to obtain the closest, human-readable address.</p>
+<p>  @tags [reverse]</p>
+
+  </section>
+</div>
+<div class="detail" id="location/1">
+  <div class="detail-header">
+    <a href="#location/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">location(data)</span>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    <p>  Returns a standartized location as a struct <code class="inline">%{Geocoder.Location}</code>.</p>
+
+  </section>
+</div>
+<div class="detail" id="place_id/1">
+  <div class="detail-header">
+    <a href="#place_id/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">place_id(data)</span>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    <p>  The place ID of the place for which you wish to obtain the human-readable address.</p>
+<p>  @tags [reverse]</p>
+
+  </section>
+</div>
+<div class="detail" id="query/2">
+  <div class="detail-header">
+    <a href="#query/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">query(data, type)</span>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    <p>  Builds a query parameters for the implementation.</p>
+
+  </section>
+</div>
+<div class="detail" id="result_type/1">
+  <div class="detail-header">
+    <a href="#result_type/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">result_type(data)</span>
+    
+    
+  </div>
+  
+  <section class="docstring">
+    <p>  One or more address types.</p>
+<p>  @tags [reverse]</p>
+
+  </section>
+</div>
+
+        </section>
+      
+
+      
+
+      
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.13.0),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+            </span>
+        </p>
+        <button class="night-mode-toggle" />
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  <script src="dist/app-21f1a20b9e.js"></script>
+  </body>
+</html>
+

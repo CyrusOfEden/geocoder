@@ -63,7 +63,7 @@ defprotocol Geocoder.Data do
   @doc """
     Builds a query parameters for the implementation.
   """
-  def query(data)
+  def query(data, type)
 
   @doc """
     Specifies the endpoint for the given implementation.

@@ -107,7 +107,7 @@ defmodule Geocoder.GoogleMaps do
   end
 
   defp one_from_map(data) when is_map(data) do
-    %Geocoder.GoogleMaps{} |> Map.merge(data |> atomize_keys)
+    %Geocoder.GoogleMaps{} |> Map.merge(data |> Geocoder.Provider.atomize_keys)
   end
 
   ##############################################################################
@@ -176,7 +176,7 @@ defmodule Geocoder.GoogleMaps do
       data.types
     end
 
-    def query(data) do
+    def query(data, _) do
       %{
         address: address(data),
         components: components(data) |> Enum.map(fn {k, v} -> "#{k}:#{v}" end) |> Enum.join("|"),
@@ -198,17 +198,5 @@ defmodule Geocoder.GoogleMaps do
       "https://maps.googleapis.com/maps/api/geocode/json"
     end
   end
-
-  ##############################################################################
-
-  defp atomize_keys(map) when is_map(map) do
-    for {k, v} <- map, into: %{} do
-      {String.to_atom(k), atomize_keys(v)}
-    end
-  end
-  defp atomize_keys(list) when is_list(list) do
-    list |> Enum.map(&atomize_keys(&1))
-  end
-  defp atomize_keys(val), do: val
 
 end

@@ -4,7 +4,7 @@ defmodule Geocoder.Mixfile do
   def project do
     [app: :geocoder,
      description: "A simple, efficient geocoder/reverse geocoder with a built-in cache.",
-     version: "0.6.2",
+     version: "0.7.0",
      elixir: "~> 1.2",
      package: package,
      build_embedded: Mix.env == :prod,
@@ -14,7 +14,7 @@ defmodule Geocoder.Mixfile do
 
   def package do
     [licenses: ["MIT"],
-     maintainers: ["Kash Nouroozi", "Arjan Scherpenisse"],
+     maintainers: ["Kash Nouroozi", "Arjan Scherpenisse", "Aleksei Matiushkin"],
      links: %{"GitHub" => "https://github.com/knrz/geocoder"}]
   end
 
@@ -29,6 +29,7 @@ defmodule Geocoder.Mixfile do
      {:towel, "~> 0.2"},
      {:poolboy, "~> 1.5"},
      {:geohash, "~> 0.1"},
-     {:ex_doc, ">= 0.0.0", only: :dev}]
+     {:ex_doc, ">= 0.0.0", only: :dev},
+     {:credo, ">= 0.0.0", only: :dev}]
   end
 end

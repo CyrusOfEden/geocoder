@@ -50,6 +50,11 @@ defmodule Geocoder.Store do
     {:reply, data, {l, s, opts}}
   end
 
+  # Stub for single entity response
+  def handle_call({:update, data}, from, {links, store, opts}) do
+    handle_call({:update, [data]}, from, {links, store, opts})
+  end
+
   # Get the state
   def handle_call(:state, _from, state) do
     {:reply, state, state}
@@ -59,6 +64,11 @@ defmodule Geocoder.Store do
   def handle_cast({:link, from, data}, {links, store, opts}) when is_list(data) do
     map = data |> Enum.reduce(links, &link_single(&2, from, &1, opts[:precision]))
     {:noreply, {map, store, opts}}
+  end
+
+  # Stub for single entity response
+  def handle_cast({:link, from, data}, {links, store, opts}) do
+    handle_cast({:link, from, [data]}, {links, store, opts})
   end
 
   ##############################################################################
