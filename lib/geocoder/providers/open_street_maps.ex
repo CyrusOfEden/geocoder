@@ -1,5 +1,3 @@
-require IEx
-
 defmodule Geocoder.Providers.OpenStreetMaps do
   use HTTPoison.Base
   use Towel
