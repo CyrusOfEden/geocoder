@@ -6,10 +6,10 @@ defmodule Geocoder.Mixfile do
      description: "A simple, efficient geocoder/reverse geocoder with a built-in cache.",
      version: "0.6.2",
      elixir: "~> 1.2",
-     package: package,
+     package: package(),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps()]
   end
 
   def package do
