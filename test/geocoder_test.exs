@@ -1,6 +1,11 @@
 defmodule GeocoderTest do
   use ExUnit.Case
 
+  test "An address in New York" do
+    {:ok, coords} = Geocoder.call("1991 15th Street, Troy, NY 12180")
+    assert_new_york coords
+  end
+
   test "An address in Belgium" do
     {:ok, coords} = Geocoder.call("Dikkelindestraat 46, 9032 Wondelgem, Belgium")
     assert_belgium coords
@@ -22,6 +27,16 @@ defmodule GeocoderTest do
     {:ok, coords} = Geocoder.call_list({51.0775264, 3.7073382})
     assert is_list(coords)
     assert Enum.count(coords) > 0
+  end
+
+  defp assert_new_york(coords) do
+    %Geocoder.Coords{bounds: bounds, location: location, lat: lat, lon: lon} = coords
+    assert location.street_number == "1991"
+    assert location.street == "15th Street"
+    assert location.city == "Troy"
+    assert location.county == "Rensselaer County"
+    assert location.country_code == "US"
+    assert location.postal_code == "12180"
   end
 
   defp assert_belgium(coords) do
