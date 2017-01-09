@@ -60,13 +60,14 @@ defmodule Geocoder.Providers.GoogleMaps do
   end
   defp geocode_bounds(_), do: %Geocoder.Bounds{}
 
-  @components ["locality", "administrative_area_level_1", "country", "postal_code", "street", "street_number", "route"]
+  @components ["locality", "administrative_area_level_1", "administrative_area_level_2", "country", "postal_code", "street", "street_number", "route"]
   @map %{
     "street_number" => :street_number,
     "route" => :street,
     "street_address" => :street,
     "locality" => :city,
     "administrative_area_level_1" => :state,
+    "administrative_area_level_2" => :county,
     "postal_code" => :postal_code,
     "country" => :country
   }
