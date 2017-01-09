@@ -1,6 +1,7 @@
 defmodule Geocoder.Location do
   defstruct city: nil,
             state: nil,
+            county: nil,
             country: nil,
             postal_code: nil,
             street: nil,
