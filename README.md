@@ -13,7 +13,7 @@ Keep calm and add Geocoder to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
-  [{:geocoder, "~> 0.4"}]
+  [{:geocoder, "~> 0.7"}]
 end
 ```
 
@@ -28,17 +28,17 @@ end
 Set pool configuration:
 
 ```elixir
-config :geocoder, Geocoder.Worker, [
+config :geocoder, :worker_pool_config, [
   size: 4,
   max_overflow: 2
 ]
 ```
 
-Set store configuration:
+Set provider configuration:
 
 ```elixir
-config :geocoder, Geocoder.Store, [
-  precision: 4 # the default
+config :geocoder, :worker, [
+  provider: Geocoder.Providers.GoogleMaps # is the default, or OpenStreetMaps
 ]
 ```
 
