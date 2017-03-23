@@ -62,19 +62,23 @@ defmodule Geocoder.Worker do
   end
 
   defp run(function, q, conf, _) when function == :geocode_list or function == :reverse_geocode_list do
-    apply(conf[:provider], function, [q])
+    apply(conf[:provider], function, [additionnal_conf(q, conf)])
   end
   defp run(function, conf, q, false) do
-    apply(conf[:provider], function, [q])
+    apply(conf[:provider], function, [additionnal_conf(q, conf)])
     |> tap(&conf[:store].update/1)
     |> tap(&conf[:store].link(q, &1))
   end
   defp run(function, q, conf, true) do
-    case apply(conf[:store], function, [q]) do
+    case apply(conf[:store], function, [additionnal_conf(q, conf)]) do
       {:just, coords} ->
         ok(coords)
       :nothing ->
         run(function, conf, q, false)
     end
+  end
+
+  defp additionnal_conf(q, conf) do
+    Keyword.merge(q, Keyword.drop(conf, [:store, :provider]))
   end
 end
