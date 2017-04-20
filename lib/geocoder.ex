@@ -18,8 +18,8 @@ defmodule Geocoder do
     import Supervisor.Spec
 
     children = [
-      :poolboy.child_spec(pool_name, worker_config, Application.get_env(:geocoder, :worker) || []),
-      worker(Geocoder.Store, [store_config])
+      :poolboy.child_spec(pool_name(), worker_config(), Application.get_env(:geocoder, :worker) || []),
+      worker(Geocoder.Store, [store_config()])
     ]
 
     options = [

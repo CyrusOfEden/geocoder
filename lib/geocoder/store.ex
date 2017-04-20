@@ -4,30 +4,30 @@ defmodule Geocoder.Store do
 
   # Public API
   def geocode(opts) do
-    GenServer.call(name, {:geocode, opts[:address]})
+    GenServer.call(name(), {:geocode, opts[:address]})
   end
 
   def reverse_geocode(opts) do
-    GenServer.call(name, {:reverse_geocode, opts[:latlng]})
+    GenServer.call(name(), {:reverse_geocode, opts[:latlng]})
   end
 
   def update(location) do
-    GenServer.call(name, {:update, location})
+    GenServer.call(name(), {:update, location})
   end
 
   def link(from, to) do
-    GenServer.cast(name, {:link, from, to})
+    GenServer.cast(name(), {:link, from, to})
   end
 
   def state do
-    GenServer.call(name, :state)
+    GenServer.call(name(), :state)
   end
 
   # GenServer API
   @defaults [precision: 4]
   def start_link(opts \\ []) do
     opts = Keyword.merge(@defaults, opts)
-    GenServer.start_link(__MODULE__, {%{}, %{}, opts}, [name: name])
+    GenServer.start_link(__MODULE__, {%{}, %{}, opts}, [name: name()])
   end
 
   # Fetch geocode
