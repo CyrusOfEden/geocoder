@@ -10,3 +10,6 @@ matrix:
   exclude:
     - elixir: 1.2.5
       otp_release: 19.0
+after_script:
+  - MIX_ENV=docs mix deps.get
+  - MIX_ENV=docs mix inch.report
