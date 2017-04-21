@@ -1,5 +1,4 @@
 Geocoder [![Build Status](https://travis-ci.org/knrz/geocoder.svg?branch=master)](https://travis-ci.org/knrz/geocoder) [![Inline docs](http://inch-ci.org/github/knrz/geocoder.svg?branch=master)](http://inch-ci.org/github/knrz/geocoder)
-
 ========
 
 A simple, efficient geocoder/reverse geocoder with a built-in cache.
