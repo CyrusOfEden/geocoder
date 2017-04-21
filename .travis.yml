@@ -23,4 +23,4 @@ matrix:
       otp_release: 19.0
       script: mix test
 after_script:
-  - mix deps.get && mix inch.report
+  - "MIX_ENV=test mix deps.get && MIX_ENV=test mix inch.report"
