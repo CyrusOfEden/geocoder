@@ -9,6 +9,7 @@ defmodule Geocoder.Mixfile do
      package: package(),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     test_coverage: [tool: Coverex.Task, console_log: false, coveralls: true],
      deps: deps()]
   end
 
@@ -30,6 +31,7 @@ defmodule Geocoder.Mixfile do
      {:poolboy, "~> 1.5"},
      {:geohash, "~> 0.1"},
      {:ex_doc, ">= 0.0.0", only: :dev},
-     {:inch_ex, only: :docs}]
+     {:inch_ex, only: :docs},
+     {:coverex, "~> 1.4.10", only: :test}]
   end
 end
