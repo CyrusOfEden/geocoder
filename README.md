@@ -69,3 +69,10 @@ Geocoder.call(address: "Toronto, ON", language: "es", key: "...", ...)
 See [here](https://developers.google.com/maps/documentation/geocoding/intro#geocoding) and [here](https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding) for a list of supported parameters for the default geocoder provider (`Geocoder.Provider.GoogleMaps`).
 
 And you're done! How simple was that?
+
+
+## Copyright and License
+
+Copyright (c) 2015, Kash Nouroozi.
+
+The source code is licensed under the [MIT License](LICENSE.md).
