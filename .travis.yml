@@ -9,7 +9,7 @@ otp_release:
   - 18.0
   - 19.0
 script:
-  - "MIX_ENV=test mix do deps.get, test && mix compile && MIX_ENV=test mix coveralls.travis"
+  - "MIX_ENV=test mix do deps.get, test && MIX_ENV=test mix coveralls.travis"
 matrix:
   exclude:
     - elixir: 1.2.5
