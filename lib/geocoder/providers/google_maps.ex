@@ -5,8 +5,10 @@ defmodule Geocoder.Providers.GoogleMaps do
   @endpoint "https://maps.googleapis.com/"
 
   def geocode(opts) do
-    request("maps/api/geocode/json", extract_opts(opts))
-    |> fmap(&parse_geocode/1)
+    case request("maps/api/geocode/json", extract_opts(opts)) do
+      {:error, reason} -> error(reason)
+      {:ok, resp} -> ok(parse_geocode(resp))
+    end
   end
 
   def geocode_list(opts) do
@@ -101,14 +103,22 @@ defmodule Geocoder.Providers.GoogleMaps do
 
   defp request_all(path, params) do
     httpoison_options = Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || []
-    get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{})))
+    resp = get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{})))
     |> fmap(&Map.get(&1, :body))
-    |> fmap(&Map.get(&1, "results"))
+
+    case resp do
+      {:ok, %{"status" => "ZERO_RESULTS"}} -> {:error, :no_results}
+      {:ok, %{"error_message" => "You have exceeded your daily request quota for this API."}} -> {:error, :quota_exceeded}
+      {:ok, %{"status" => "OK"} = resp} -> {:ok, Map.get(resp, "results")}
+      other_results -> {:error, :unknown_error}
+    end
   end
 
   defp request(path, params) do
-    request_all(path, params)
-    |> fmap(&List.first/1)
+    case request_all(path, params) do
+      {:ok, [result | _results]} -> {:ok, result}
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   defp process_url(url) do
