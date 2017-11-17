@@ -107,10 +107,14 @@ defmodule Geocoder.Providers.GoogleMaps do
     |> fmap(&Map.get(&1, :body))
 
     case resp do
-      {:ok, %{"status" => "ZERO_RESULTS"}} -> {:error, :no_results}
-      {:ok, %{"error_message" => "You have exceeded your daily request quota for this API."}} -> {:error, :quota_exceeded}
-      {:ok, %{"status" => "OK"} = resp} -> {:ok, Map.get(resp, "results")}
-      other_results -> {:error, :unknown_error}
+      {:ok, %{"status" => "ZERO_RESULTS"}} ->
+        {:error, :no_results}
+      {:ok, %{"error_message" => "You have exceeded your" <> _}} ->
+        {:error, :quota_exceeded}
+      {:ok, %{"status" => "OK"} = resp} ->
+        {:ok, Map.get(resp, "results")}
+      other_results ->
+        {:error, :unknown_error}
     end
   end
 
