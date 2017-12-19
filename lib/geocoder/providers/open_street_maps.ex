@@ -41,7 +41,7 @@ defmodule Geocoder.Providers.OpenStreetMaps do
                      :latlon, :lat, :lon, :placeid, :result_type, :location_type] ++ Keyword.keys(@defaults))
   end
 
-  # defp parse_geocode([]), do: :error
+  defp parse_geocode([]), do: :error
   defp parse_geocode(response) do
     coords = geocode_coords(response)
     bounds = geocode_bounds(response)
@@ -49,7 +49,7 @@ defmodule Geocoder.Providers.OpenStreetMaps do
     %{coords | bounds: bounds, location: location}
   end
 
-  # defp parse_reverse_geocode([]), do: :error
+  defp parse_reverse_geocode([]), do: :error
   defp parse_reverse_geocode(response) do
     coords = geocode_coords(response)
     bounds = geocode_bounds(response)
