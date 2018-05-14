@@ -3,7 +3,7 @@ defmodule Geocoder.Providers.OpenStreetMaps do
   use Towel
 
   # url="https://nominatim.openstreetmap.org/reverse?format=json&accept-language={{ language }}&lat={{ latitude }}&lon={{ longitude }}&zoom={{ zoom }}&addressdetails=1"
-  @endpoint "http://nominatim.openstreetmap.org/"
+  @endpoint "https://nominatim.openstreetmap.org/"
   @endpath_reverse  "/reverse"
   @endpath_search   "/search"
   @defaults [format: "json", "accept-language": "en", "addressdetails": 1]
