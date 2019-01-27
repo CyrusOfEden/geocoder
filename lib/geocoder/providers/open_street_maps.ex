@@ -30,16 +30,18 @@ defmodule Geocoder.Providers.OpenStreetMaps do
 
   defp extract_opts(opts) do
     @defaults
-    |> Keyword.merge(opts)
+    |> Keyword.merge(opts)  
+    |> Keyword.update!(:"accept-language", fn default -> opts[:language] || default end)
     |> Keyword.put(:q, case opts |> Keyword.take([:address, :latlng]) |> Keyword.values do
                          [{lat, lon}] -> "#{lat},#{lon}"
                          [query] -> query
                          _ -> nil
                        end)
-    |> Keyword.take([:q, :key, :address, :components, :bounds, :language, :region,
+    |> Keyword.take([:q, :key, :address, :components, :bounds, :region,
                      :latlon, :lat, :lon, :placeid, :result_type, :location_type] ++ Keyword.keys(@defaults))
   end
 
+  defp parse_geocode([]), do: :error
   defp parse_geocode(response) do
     coords = geocode_coords(response)
     bounds = geocode_bounds(response)
@@ -47,6 +49,7 @@ defmodule Geocoder.Providers.OpenStreetMaps do
     %{coords | bounds: bounds, location: location}
   end
 
+  defp parse_reverse_geocode([]), do: :error
   defp parse_reverse_geocode(response) do
     coords = geocode_coords(response)
     bounds = geocode_bounds(response)
@@ -100,7 +103,7 @@ defmodule Geocoder.Providers.OpenStreetMaps do
   defp request_all(path, params) do
     httpoison_options = Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || []
     case get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{}))) |> fmap(&Map.get(&1, :body)) do
-      {:ok, [list]} -> {:ok, [list]}
+      {:ok, list} when is_list(list) -> {:ok, list}
       {:ok, single} -> {:ok, [single]}
       other -> other
     end
