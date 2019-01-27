@@ -22,7 +22,8 @@ defmodule Geocoder.Worker do
   # GenServer API
   @worker_defaults [
     store: Geocoder.Store,
-    provider: Geocoder.Providers.GoogleMaps # or OpenStreetMaps
+    # or OpenStreetMaps
+    provider: Geocoder.Providers.GoogleMaps
   ]
   def init(conf) do
     {:ok, Keyword.merge(@worker_defaults, conf)}
@@ -37,9 +38,10 @@ defmodule Geocoder.Worker do
   end
 
   def handle_cast({function, q, opts}, conf) do
-    Task.start_link fn ->
+    Task.start_link(fn ->
       send(opts[:stream_to], run(function, conf, q, opts[:store]))
-    end
+    end)
+
     {:noreply, conf}
   end
 
@@ -53,26 +55,30 @@ defmodule Geocoder.Worker do
   defp assign(name, q, opts) do
     opts = Keyword.merge(@assign_defaults, opts)
 
-    function = case {opts[:stream_to], {name, q, opts}} do
-      {nil, message} -> &GenServer.call(&1, message, opts[:timeout])
-      {_,   message} -> &GenServer.cast(&1, message)
-    end
+    function =
+      case {opts[:stream_to], {name, q, opts}} do
+        {nil, message} -> &GenServer.call(&1, message, opts[:timeout])
+        {_, message} -> &GenServer.cast(&1, message)
+      end
 
-    :poolboy.transaction(Geocoder.pool_name, function, opts[:timeout])
+    :poolboy.transaction(Geocoder.pool_name(), function, opts[:timeout])
   end
 
-  defp run(function, q, conf, _) when function == :geocode_list or function == :reverse_geocode_list do
+  defp run(function, q, conf, _) when function in [:geocode_list, :reverse_geocode_list] do
     apply(conf[:provider], function, [additionnal_conf(q, conf)])
   end
+
   defp run(function, conf, q, false) do
     apply(conf[:provider], function, [additionnal_conf(q, conf)])
     |> tap(&conf[:store].update/1)
     |> tap(&conf[:store].link(q, &1))
   end
+
   defp run(function, q, conf, true) do
     case apply(conf[:store], function, [additionnal_conf(q, conf)]) do
       {:just, coords} ->
         ok(coords)
+
       :nothing ->
         run(function, conf, q, false)
     end

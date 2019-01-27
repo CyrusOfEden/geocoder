@@ -24,33 +24,37 @@ defmodule Geocoder.Store do
   end
 
   # GenServer API
+  def init(args), do: {:ok, args}
+
   @defaults [precision: 4]
   def start_link(opts \\ []) do
     opts = Keyword.merge(@defaults, opts)
-    GenServer.start_link(__MODULE__, {%{}, %{}, opts}, [name: name()])
+    GenServer.start_link(__MODULE__, {%{}, %{}, opts}, name: name())
   end
 
   # Fetch geocode
-  def handle_call({:geocode, location}, _from, {links,store,_} = state) do
+  def handle_call({:geocode, location}, _from, {links, store, _} = state) do
     key = encode(location)
     result = Maybe.wrap(links) |> fmap(&Map.get(&1, key)) |> fmap(&Map.get(store, &1))
     {:reply, result, state}
   end
 
   # Fetch reverse geocode
-  def handle_call({:reverse_geocode, latlon}, _from, {_,store,opts} = state) do
+  def handle_call({:reverse_geocode, latlon}, _from, {_, store, opts} = state) do
     key = encode(latlon, opts[:precision])
     result = Maybe.wrap(store) |> fmap(&Map.get(&1, key))
     {:reply, result, state}
   end
 
   # Update store
-  def handle_call({:update, coords}, _from, {links,store,opts}) do
+  def handle_call({:update, coords}, _from, {links, store, opts}) do
     %{lat: lat, lon: lon} = coords
+
     location =
       coords.location
       |> Map.take(~w[city, state, country]a)
-      |> Enum.filter_map(&is_binary(elem(&1, 1)), &elem(&1, 1))
+      |> Enum.filter(&is_binary(elem(&1, 1)))
+      |> Enum.map(&elem(&1, 1))
       |> Enum.join("")
 
     key = encode({lat, lon}, opts[:precision])
@@ -74,15 +78,17 @@ defmodule Geocoder.Store do
 
   # Private API
   defp encode(location, opt \\ nil)
+
   defp encode({lat, lon}, precision) do
     Geohash.encode(:erlang.float(lat), :erlang.float(lon), precision)
   end
+
   defp encode(location, _) when is_binary(location) do
     location
-    |> String.downcase
+    |> String.downcase()
     |> String.replace(~r/[^\w]/, "")
-    |> String.strip
-    |> :base64.encode
+    |> String.trim()
+    |> :base64.encode()
   end
 
   # Config

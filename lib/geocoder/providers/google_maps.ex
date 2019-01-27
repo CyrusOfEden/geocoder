@@ -11,7 +11,7 @@ defmodule Geocoder.Providers.GoogleMaps do
 
   def geocode_list(opts) do
     request_all("maps/api/geocode/json", extract_opts(opts))
-    |> fmap(fn(r) -> Enum.map(r, &parse_geocode/1) end)
+    |> fmap(fn r -> Enum.map(r, &parse_geocode/1) end)
   end
 
   def reverse_geocode(opts) do
@@ -21,17 +21,27 @@ defmodule Geocoder.Providers.GoogleMaps do
 
   def reverse_geocode_list(opts) do
     request_all("maps/api/geocode/json", extract_opts(opts))
-    |> fmap(fn(r) -> Enum.map(r, &parse_reverse_geocode/1) end)
+    |> fmap(fn r -> Enum.map(r, &parse_reverse_geocode/1) end)
   end
 
   defp extract_opts(opts) do
     opts
-    |> Keyword.take([:key, :address, :components, :bounds, :language, :region,
-                     :latlng, :placeid, :result_type, :location_type])
+    |> Keyword.take([
+      :key,
+      :address,
+      :components,
+      :bounds,
+      :language,
+      :region,
+      :latlng,
+      :placeid,
+      :result_type,
+      :location_type
+    ])
     |> Keyword.update(:latlng, nil, fn
-         {lat, lng} -> "#{lat},#{lng}"
-         q -> q
-       end)
+      {lat, lng} -> "#{lat},#{lng}"
+      q -> q
+    end)
     |> Keyword.delete(:latlng, nil)
   end
 
@@ -54,13 +64,26 @@ defmodule Geocoder.Providers.GoogleMaps do
   end
 
   defp geocode_bounds(%{"geometry" => %{"bounds" => bounds}}) do
-    %{"northeast" => %{"lat" => north, "lng" => east},
-      "southwest" => %{"lat" => south, "lng" => west}} = bounds
+    %{
+      "northeast" => %{"lat" => north, "lng" => east},
+      "southwest" => %{"lat" => south, "lng" => west}
+    } = bounds
+
     %Geocoder.Bounds{top: north, right: east, bottom: south, left: west}
   end
+
   defp geocode_bounds(_), do: %Geocoder.Bounds{}
 
-  @components ["locality", "administrative_area_level_1", "administrative_area_level_2", "country", "postal_code", "street", "street_number", "route"]
+  @components [
+    "locality",
+    "administrative_area_level_1",
+    "administrative_area_level_2",
+    "country",
+    "postal_code",
+    "street",
+    "street_number",
+    "route"
+  ]
   @map %{
     "street_number" => :street_number,
     "route" => :street,
@@ -71,51 +94,69 @@ defmodule Geocoder.Providers.GoogleMaps do
     "postal_code" => :postal_code,
     "country" => :country
   }
-  defp geocode_location(%{"address_components" => components, "formatted_address" => formatted_address}) do
+  defp geocode_location(%{
+         "address_components" => components,
+         "formatted_address" => formatted_address
+       }) do
     name = &Map.get(&1, "long_name")
+
     type = fn component ->
       component |> Map.get("types") |> Enum.find(&Enum.member?(@components, &1))
     end
-    map = &({type.(&1), name.(&1)})
+
+    map = &{type.(&1), name.(&1)}
+
     reduce = fn {type, name}, location ->
-      Map.put(location, Map.get(@map, type), name)
+      struct(location, [{@map[type], name}])
     end
 
-    country = Enum.find(components, fn(component) ->
-      component |> Map.get("types") |> Enum.member?("country")
-    end)
+    country =
+      Enum.find(components, fn component ->
+        component |> Map.get("types") |> Enum.member?("country")
+      end)
 
-    country_code = case country do
-      nil ->
-        nil
-    %{"short_name" => name} ->
-        name
-    end
+    country_code =
+      case country do
+        nil ->
+          nil
 
-    location = %Geocoder.Location{country_code: country_code, formatted_address: formatted_address}
+        %{"short_name" => name} ->
+          name
+      end
+
+    location = %Geocoder.Location{
+      country_code: country_code,
+      formatted_address: formatted_address
+    }
 
     components
-    |> Enum.filter_map(type, map)
+    |> Enum.filter(type)
+    |> Enum.map(map)
     |> Enum.reduce(location, reduce)
   end
 
   defp request_all(path, params) do
     httpoison_options = Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || []
-    get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{})))
-    |> fmap(&Map.get(&1, :body))
-    |> fmap(&Map.get(&1, "results"))
+
+    case get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{}))) do
+      {:ok, %{status_code: 200, body: %{"results" => results}}} ->
+        {:ok, List.wrap(results)}
+
+      {_, response} ->
+        {:error, response}
+    end
   end
 
-  defp request(path, params) do
+  def request(path, params) do
     request_all(path, params)
     |> fmap(&List.first/1)
   end
 
-  defp process_url(url) do
+  def process_url(url) do
     @endpoint <> url
   end
 
-  defp process_response_body(body) do
-    body |> Poison.decode!
+  def process_response_body(body) do
+    body |> Poison.decode!()
   end
 end
