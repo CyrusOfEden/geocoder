@@ -6,5 +6,5 @@ config :geocoder, :worker_pool_config, [
 ]
 
 config :geocoder, :worker, [
-  provider: Geocoder.Providers.GoogleMaps # OpenStreetMaps
+  provider: Geocoder.Providers.OpenStreetMaps
 ]

@@ -80,8 +80,8 @@ defmodule Geocoder.Providers.OpenStreetMaps do
   #   "osm_id" => "45352282", "osm_type" => "way", "place_id" => "70350383"}
   @components ~W[city city_district country country_code county postcode road state]
   @map %{
-    "city_district" => :city,
-    "county" => :city,
+    "house_number" => :street_number,
+    "county" => :county,
     "city" => :city,
     "road" => :street,
     "state" => :state,
