@@ -64,17 +64,17 @@ defmodule Geocoder.Worker do
     :poolboy.transaction(Geocoder.pool_name(), function, opts[:timeout])
   end
 
-  defp run(function, q, conf, _) when function in [:geocode_list, :reverse_geocode_list] do
+  def run(function, q, conf, _) when function in [:geocode_list, :reverse_geocode_list] do
     apply(conf[:provider], function, [additionnal_conf(q, conf)])
   end
 
-  defp run(function, conf, q, false) do
+  def run(function, conf, q, false) do
     apply(conf[:provider], function, [additionnal_conf(q, conf)])
     |> tap(&conf[:store].update/1)
     |> tap(&conf[:store].link(q, &1))
   end
 
-  defp run(function, q, conf, true) do
+  def run(function, q, conf, true) do
     case apply(conf[:store], function, [additionnal_conf(q, conf)]) do
       {:just, coords} ->
         ok(coords)
@@ -84,7 +84,7 @@ defmodule Geocoder.Worker do
     end
   end
 
-  defp additionnal_conf(q, conf) do
+  def additionnal_conf(q, conf) do
     Keyword.merge(q, Keyword.drop(conf, [:store, :provider]))
   end
 end
