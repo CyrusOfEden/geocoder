@@ -2,15 +2,39 @@ language: elixir
 notifications:
   email: false
 elixir:
-  - 1.3.0
-  - 1.4.2
-  - 1.9.1
+  - 1.6
+  - 1.7
+  - 1.8
+  - 1.9
 otp_release:
-  - 20.0
+  - 19.3
+  - 20.3
   - 21.0
   - 22.0
-env:
-  - MIX_ENV=test
+matrix:
+  exclude:
+    - elixir: 1.6
+      otp_release: 21.0
+    - elixir: 1.6
+      otp_release: 22.0
+    - elixir: 1.7
+      otp_release: 19.3
+    - elixir: 1.7
+      otp_release: 20.3
+    - elixir: 1.8
+      otp_release: 19.3
+    - elixir: 1.8
+      otp_release: 20.3
+    - elixir: 1.9
+      otp_release: 19.3
+    - elixir: 1.9
+      otp_release: 20.3
+
+env: MIX_ENV=test
+sudo: false # faster builds
+
+before_script:
+  - mix deps.get
 script:
   - mix coveralls.travis
   - mix test
