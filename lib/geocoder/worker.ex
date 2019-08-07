@@ -22,8 +22,7 @@ defmodule Geocoder.Worker do
   # GenServer API
   @worker_defaults [
     store: Geocoder.Store,
-    # or OpenStreetMaps
-    provider: Geocoder.Providers.GoogleMaps
+    provider: Geocoder.Providers.OpenStreetMaps
   ]
   def init(conf) do
     {:ok, Keyword.merge(@worker_defaults, conf)}
