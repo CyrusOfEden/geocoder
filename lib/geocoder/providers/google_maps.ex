@@ -136,12 +136,15 @@ defmodule Geocoder.Providers.GoogleMaps do
   end
 
   defp request_all(path, params) do
+    params = Keyword.merge(params, key: Application.get_env(:geocoder, :worker)[:key])
     httpoison_options = Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || []
 
     case get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{}))) do
-      {:ok, %{status_code: 200, body: %{"results" => results}}} ->
+      # API does not return a non-200 code when there is an error!
+      {:ok, %{status_code: 200, body: %{"results" => [], "error_message" => error_message, "status" => error_status}}} ->
+        {:error, error_message}
+      {:ok, %{status_code: 200, body: %{"status" => "OK", "results" => results}}} ->
         {:ok, List.wrap(results)}
-
       {_, response} ->
         {:error, response}
     end

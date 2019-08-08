@@ -5,8 +5,10 @@ defmodule Geocoder.Mixfile do
     [
       app: :geocoder,
       description: "A simple, efficient geocoder/reverse geocoder with a built-in cache.",
+      source_url: "https://github.com/knrz/geocoder",
+      homepage_url: "https://github.com/knrz/geocoder",
       version: "1.0.0",
-      elixir: "~> 1.2",
+      elixir: "~> 1.6",
       otp: "~> 20",
       package: package(),
       build_embedded: Mix.env() == :prod,
@@ -31,7 +33,10 @@ defmodule Geocoder.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :poolboy, :httpoison, :geohash], mod: {Geocoder, []}]
+    [
+      extra_applications: [:logger],
+      mod: {Geocoder, []}
+    ]
   end
 
   defp deps do
