@@ -95,6 +95,6 @@ By default, the tests run on OpenStreetMaps.
 
 ## Copyright and License
 
-Copyright (c) 2015, Kash Nouroozi.
+Copyright (c) 2019, Kash Nouroozi.
 
 The source code is licensed under the [MIT License](LICENSE.md).
