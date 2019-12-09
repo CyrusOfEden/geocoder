@@ -141,7 +141,7 @@ defmodule Geocoder.Providers.GoogleMaps do
 
     case get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{}))) do
       # API does not return a non-200 code when there is an error!
-      {:ok, %{status_code: 200, body: %{"results" => [], "error_message" => error_message, "status" => error_status}}} ->
+      {:ok, %{status_code: 200, body: %{"results" => [], "error_message" => error_message, "status" => _status}}} ->
         {:error, error_message}
       {:ok, %{status_code: 200, body: %{"status" => "OK", "results" => results}}} ->
         {:ok, List.wrap(results)}

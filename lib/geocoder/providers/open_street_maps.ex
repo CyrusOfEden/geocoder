@@ -105,7 +105,6 @@ defmodule Geocoder.Providers.OpenStreetMaps do
   #   "licence" => "Data © OpenStreetMap contributors, ODbL 1.0. http://www.openstreetmap.org/copyright",
   #   "lon" => "3.7074267",
   #   "osm_id" => "45352282", "osm_type" => "way", "place_id" => "70350383"}
-  @components ~W[city city_district country country_code county postcode road state]
   @map %{
     "house_number" => :street_number,
     "county" => :county,
