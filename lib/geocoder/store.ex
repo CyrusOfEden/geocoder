@@ -52,7 +52,7 @@ defmodule Geocoder.Store do
 
     location =
       coords.location
-      |> Map.take(~w[city, state, country]a)
+      |> Map.take(~w[city state country]a)
       |> Enum.filter(&is_binary(elem(&1, 1)))
       |> Enum.map(&elem(&1, 1))
       |> Enum.join("")
