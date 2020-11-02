@@ -154,6 +154,6 @@ defmodule Geocoder.Providers.OpenStreetMaps do
   end
 
   def process_response_body(body) do
-    body |> Poison.decode!()
+    body |> Jason.decode!()
   end
 end
