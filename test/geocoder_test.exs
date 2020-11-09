@@ -11,6 +11,20 @@ defmodule GeocoderTest do
     assert_belgium(coords)
   end
 
+  test "properly handles call-specific provider and key configurations" do
+    {:error, "missing API key"} =
+      Geocoder.call("1991 15th Street, Troy, NY 12180", provider: Geocoder.Providers.OpenCageData)
+
+    {
+      :error,
+      "invalid API key"
+    } =
+      Geocoder.call("1991 15th Street, Troy, NY 12180",
+        provider: Geocoder.Providers.OpenCageData,
+        key: "bad_key"
+      )
+  end
+
   test "Reverse geocode" do
     {:ok, coords} = Geocoder.call({51.0775264, 3.7073382})
     assert_belgium(coords)
