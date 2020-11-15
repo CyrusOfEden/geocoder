@@ -136,7 +136,9 @@ defmodule Geocoder.Providers.GoogleMaps do
   end
 
   defp request_all(path, params) do
-    params = Keyword.merge(params, key: params[:key] || Application.get_env(:geocoder, :worker)[:key])
+    params =
+      Keyword.merge(params, key: params[:key] || Application.get_env(:geocoder, :worker)[:key])
+
     httpoison_options = Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || []
 
     case get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{}))) do
