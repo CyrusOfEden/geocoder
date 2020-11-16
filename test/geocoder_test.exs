@@ -1,6 +1,18 @@
 defmodule GeocoderTest do
   use ExUnit.Case
 
+  setup do
+    # there's some state we need to clear before each test run
+    # https://github.com/sasa1977/con_cache/issues/11#issuecomment-116806567
+    :ok = Supervisor.terminate_child(Geocoder.Supervisor, Geocoder.Store)
+    {:ok, _} = Supervisor.restart_child(Geocoder.Supervisor, Geocoder.Store)
+
+    # OpenStreetData is rate-limited at 1rps. Let's ensure our tests don't break that rate limit.
+    Process.sleep(1_000)
+
+    :ok
+  end
+
   test "An address in New York" do
     {:ok, coords} = Geocoder.call("1991 15th Street, Troy, NY 12180")
     assert_new_york(coords)
@@ -9,6 +21,20 @@ defmodule GeocoderTest do
   test "An address in Belgium" do
     {:ok, coords} = Geocoder.call("Dikkelindestraat 46, 9032 Wondelgem, Belgium")
     assert_belgium(coords)
+  end
+
+  test "properly handles call-specific provider and key configurations" do
+    {:error, "missing API key"} =
+      Geocoder.call("1991 15th Street, Troy, NY 12180", provider: Geocoder.Providers.OpenCageData)
+
+    {
+      :error,
+      "invalid API key"
+    } =
+      Geocoder.call("1991 15th Street, Troy, NY 12180",
+        provider: Geocoder.Providers.OpenCageData,
+        key: "bad_key"
+      )
   end
 
   test "Reverse geocode" do

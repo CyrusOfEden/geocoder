@@ -23,6 +23,8 @@ Update your mix dependencies:
 mix deps.get
 ```
 
+If you are Elixir < 1.9, you'll need to use a version before `1.0`.
+
 Configuration
 -------------
 
@@ -43,7 +45,7 @@ config :geocoder, :worker,
   key: System.get_env("GEOCODER_GOOGLE_API_KEY")
 ```
 
-Note that `OpenStreetMaps` is the only provider that does not require an API key to operate.
+Note that `OpenStreetMaps` (the default provider) is the only provider that does not require an API key to operate.
 All other providers require an API key that you'll need to provide.
 
 If you need to set a proxy (or any other option supported by HTTPoison.get/3):
@@ -72,7 +74,19 @@ You can pass options to the function that will be passed to the geocoder provide
 Geocoder.call(address: "Toronto, ON", language: "es", key: "...", ...)
 ```
 
-See [here](https://developers.google.com/maps/documentation/geocoding/intro#geocoding) and [here](https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding) for a list of supported parameters for the default geocoder provider (`Geocoder.Provider.GoogleMaps`).
+You can also change the provider on a per-call basis:
+
+```elixir
+{:ok, coordinates } =
+  with
+    # use the default provider
+    {:error, nil} <- Geocoder.call(query),
+    # use an alternative provider. If `key` is not specified here the globally defined key will be used.
+    {:error, nil} <- Geocoder.call(query, provider: Geocoder.Providers.OpenCageData, key: "123"),
+    do: {:error}
+```
+
+See [here](https://developers.google.com/maps/documentation/geocoding/intro#geocoding) and [here](https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding) for a list of supported parameters for the google maps geocoder provider (`Geocoder.Provider.GoogleMaps`).
 
 And you're done! How simple was that?
 

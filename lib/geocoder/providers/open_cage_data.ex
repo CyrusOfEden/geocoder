@@ -105,14 +105,19 @@ defmodule Geocoder.Providers.OpenCageData do
 
   defp request_all(path, params) do
     httpoison_options = Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || []
-    params = Keyword.merge(params, key: Application.get_env(:geocoder, :worker)[:key])
+
+    params =
+      Keyword.merge(params, key: params[:key] || Application.get_env(:geocoder, :worker)[:key])
+
     result = get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{})))
 
     case result do
-      {:ok, %{status_code: 401, body: %{"status" => %{"message" => message }}}} ->
+      {:ok, %{status_code: 401, body: %{"status" => %{"message" => message}}}} ->
         {:error, message}
+
       {:ok, %{status_code: 200, body: %{"results" => results}}} ->
         {:ok, List.wrap(results)}
+
       {_, response} ->
         {:error, response}
     end
