@@ -7,8 +7,8 @@ defmodule Geocoder.Mixfile do
       description: "A simple, efficient geocoder/reverse geocoder with a built-in cache.",
       source_url: "https://github.com/knrz/geocoder",
       homepage_url: "https://github.com/knrz/geocoder",
-      version: "1.0.0",
-      elixir: "~> 1.6",
+      version: "1.1.0",
+      elixir: "~> 1.9",
       otp: "~> 20",
       package: package(),
       build_embedded: Mix.env() == :prod,
@@ -27,7 +27,7 @@ defmodule Geocoder.Mixfile do
   def package do
     [
       licenses: ["MIT"],
-      maintainers: ["Kash Nouroozi", "Arjan Scherpenisse"],
+      maintainers: ["Kash Nouroozi", "Arjan Scherpenisse", "Michael Bianco"],
       links: %{"GitHub" => "https://github.com/knrz/geocoder"}
     ]
   end
