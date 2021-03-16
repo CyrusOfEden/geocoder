@@ -42,7 +42,6 @@ defmodule Geocoder.Providers.GoogleMaps do
       {lat, lng} -> "#{lat},#{lng}"
       q -> q
     end)
-    |> Keyword.delete(:latlng)
   end
 
   defp parse_geocode(response) do
