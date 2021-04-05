@@ -48,7 +48,7 @@ defmodule Geocoder.Mixfile do
       {:geohash, "~> 1.2"},
       {:ex_doc, "~> 0.19", only: :dev},
       {:inch_ex, ">= 0.0.0", only: :docs},
-      {:excoveralls, "~> 0.6.3", only: :test}
+      {:excoveralls, "~> 0.14", only: :test}
     ]
   end
 end
