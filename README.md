@@ -1,4 +1,4 @@
-Geocoder [![Build Status](https://travis-ci.org/knrz/geocoder.svg?branch=master)](https://travis-ci.org/knrz/geocoder) [![Inline docs](http://inch-ci.org/github/knrz/geocoder.svg?branch=master)](http://inch-ci.org/github/knrz/geocoder) [![Coverage Status](https://coveralls.io/repos/github/knrz/geocoder/badge.svg?branch=master)](https://coveralls.io/github/knrz/geocoder?branch=master)
+Geocoder ![Build Status](https://github.com/knrz/geocoder/actions/workflows/elixir.yml/badge.svg) [![Inline docs](http://inch-ci.org/github/knrz/geocoder.svg?branch=master)](http://inch-ci.org/github/knrz/geocoder) [![Coverage Status](https://coveralls.io/repos/github/knrz/geocoder/badge.svg?branch=master)](https://coveralls.io/github/knrz/geocoder?branch=master)
 ========
 
 A simple, efficient geocoder/reverse geocoder with a built-in cache.
@@ -13,13 +13,13 @@ Keep calm and add Geocoder to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
-  [{:geocoder, "~> 1.0"}]
+  [{:geocoder, "~> 1.1"}]
 end
 ```
 
 Update your mix dependencies:
 
-```
+```bash
 mix deps.get
 ```
 
