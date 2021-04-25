@@ -1,66 +1,54 @@
-name: tests
+# base configuration pulled from:
+# https://github.com/dashbitco/broadway/blob/master/.github/workflows/ci.yml
+
+name: CI
 on: push
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  MIX_ENV: test
-
-# https://github.com/elixir-lang/elixir/blob/master/lib/elixir/pages/compatibility-and-deprecations.md
 jobs:
-  elixir_1_11:
-    runs-on: ubuntu-latest
-    name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+  test:
+    # using `ubuntu-latest` does not support older OTP versions
+    runs-on: ubuntu-18.04
+    env:
+      MIX_ENV: test
+      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
     strategy:
+      fail-fast: false
       matrix:
-        otp: [21.x, 22.x, 23.x]
-        elixir: [1.11.x]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: erlef/setup-beam@v1
-        with:
-          otp-version: ${{matrix.otp}}
-          elixir-version: ${{matrix.elixir}}
-      - run: mix do deps.get, compile --warnings-as-errors
-      - run: mix format --dry-run --check-formatted
-      - run: mix coveralls.github
-      - run: MIX_ENV=docs mix deps.get
-      - run: MIX_ENV=docs mix inch.report
-
-  elixir_1_10:
-    runs-on: ubuntu-latest
-    name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
-    strategy:
-      matrix:
+        # https://repo.hex.pm/builds/elixir/builds.txt
+        elixir: [1.9.4, 1.10.4, 1.11.3]
         otp: [21.x, 22.x]
-        elixir: [1.10.x]
+        include:
+          - elixir: 1.9.4
+            otp: 20.x
+          - elixir: 1.11.3
+            otp: 23.3
+            lint: lint
+            coverage: coverage
     steps:
       - uses: actions/checkout@v2
+
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
-      - run: mix do deps.get, compile --warnings-as-errors
-      - run: mix format --dry-run --check-formatted
-      - run: mix coveralls.github
-      - run: MIX_ENV=docs mix deps.get
-      - run: MIX_ENV=docs mix inch.report
 
+      - name: Install Dependencies
+        run: mix deps.get --only test
 
-  elixir_1_9:
-    runs-on: ubuntu-latest
-    name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
-    strategy:
-      matrix:
-        otp: [20.x, 21.x, 22.x]
-        elixir: [1.9.x]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: erlef/setup-beam@v1
-        with:
-          otp-version: ${{matrix.otp}}
-          elixir-version: ${{matrix.elixir}}
-      - run: mix do deps.get, compile --warnings-as-errors
-      - run: mix format --dry-run --check-formatted
+      - run: mix format --check-formatted
+        if: ${{ matrix.lint }}
+
+      - run: mix deps.get && mix deps.unlock --check-unused
+        if: ${{ matrix.lint }}
+
+      - run: mix deps.compile
+
+      - run: mix compile --warnings-as-errors
+        if: ${{ matrix.lint }}
+
+      - run: mix test
+
       - run: mix coveralls.github
-      - run: MIX_ENV=docs mix deps.get
-      - run: MIX_ENV=docs mix inch.report
+        if: ${{matrix.coverage}}
+
+      - run: MIX_ENV=docs mix do deps.get, inch.report
