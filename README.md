@@ -107,6 +107,13 @@ PROVIDER=google mix test
 
 By default, the tests run on OpenStreetMaps.
 
+Related & Alternative Packages
+------------------------------
+
+* https://github.com/amotion-city/lib_lat_lon
+* https://github.com/navinpeiris/geoip
+* https://github.com/elixir-geolix/geolix
+
 ## Copyright and License
 
 Copyright (c) 2019, Kash Nouroozi.
