@@ -82,14 +82,14 @@ defmodule Geocoder.Providers.OpenStreetMaps do
   end
 
   defp geocode_coords(%{"lat" => lat, "lon" => lon}) do
-    [lat, lon] = [lat, lon] |> Enum.map(&elem(Float.parse(&1),0))
+    [lat, lon] = [lat, lon] |> Enum.map(&elem(Float.parse(&1), 0))
     %Geocoder.Coords{lat: lat, lon: lon}
   end
 
   defp geocode_coords(_), do: %Geocoder.Coords{}
 
   defp geocode_bounds(%{"boundingbox" => bbox}) do
-    [north, south, west, east] = bbox |> Enum.map(&elem(Float.parse(&1),0))
+    [north, south, west, east] = bbox |> Enum.map(&elem(Float.parse(&1), 0))
     %Geocoder.Bounds{top: north, right: east, bottom: south, left: west}
   end
 
