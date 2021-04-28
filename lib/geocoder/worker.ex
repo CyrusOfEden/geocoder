@@ -78,8 +78,8 @@ defmodule Geocoder.Worker do
 
   def run(function, params, false) do
     apply(params[:provider], function, [params])
-    |> tap(&params[:store].update/1)
-    |> tap(&params[:store].link(params, &1))
+    |> Monad.tap(&params[:store].update/1)
+    |> Monad.tap(&params[:store].link(params, &1))
   end
 
   def run(function, params, true) do
