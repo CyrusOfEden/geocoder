@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="earmark_parser" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/earmark_parser/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/earmark_parser/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/earmark_parser/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/earmark_parser/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/earmark_parser/lib" />
+      <root url="file://$PROJECT_DIR$/deps/earmark_parser/src" />
+      <root url="file://$PROJECT_DIR$/deps/earmark_parser/lib" />
+      <root url="file://$PROJECT_DIR$/deps/earmark_parser/src" />
+      <root url="file://$PROJECT_DIR$/deps/earmark_parser/lib" />
+      <root url="file://$PROJECT_DIR$/deps/earmark_parser/src" />
+      <root url="file://$PROJECT_DIR$/deps/earmark_parser/lib" />
+      <root url="file://$PROJECT_DIR$/deps/earmark_parser/src" />
+    </SOURCES>
+  </library>
+</component>

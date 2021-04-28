@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="certifi" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/certifi/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/certifi/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/certifi/src" />
+      <root url="file://$PROJECT_DIR$/deps/certifi/priv" />
+      <root url="file://$PROJECT_DIR$/deps/certifi/src" />
+      <root url="file://$PROJECT_DIR$/deps/certifi/priv" />
+      <root url="file://$PROJECT_DIR$/deps/certifi/src" />
+      <root url="file://$PROJECT_DIR$/deps/certifi/priv" />
+      <root url="file://$PROJECT_DIR$/deps/certifi/src" />
+      <root url="file://$PROJECT_DIR$/deps/certifi/priv" />
+      <root url="file://$PROJECT_DIR$/deps/certifi/src" />
+      <root url="file://$PROJECT_DIR$/deps/certifi/priv" />
+    </SOURCES>
+  </library>
+</component>

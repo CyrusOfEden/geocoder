@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="ssl_verify_fun" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/ssl_verify_fun/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/ssl_verify_fun/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/ssl_verify_fun/src" />
+      <root url="file://$PROJECT_DIR$/deps/ssl_verify_fun/src" />
+      <root url="file://$PROJECT_DIR$/deps/ssl_verify_fun/src" />
+      <root url="file://$PROJECT_DIR$/deps/ssl_verify_fun/src" />
+      <root url="file://$PROJECT_DIR$/deps/ssl_verify_fun/src" />
+    </SOURCES>
+  </library>
+</component>

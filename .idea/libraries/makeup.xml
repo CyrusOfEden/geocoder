@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="makeup" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/makeup/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/makeup/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/makeup/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/makeup/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/makeup/lib" />
+      <root url="file://$PROJECT_DIR$/deps/makeup/lib" />
+      <root url="file://$PROJECT_DIR$/deps/makeup/lib" />
+      <root url="file://$PROJECT_DIR$/deps/makeup/lib" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="geohash" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/geohash/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/geohash/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/geohash/lib" />
+      <root url="file://$PROJECT_DIR$/deps/geohash/lib" />
+      <root url="file://$PROJECT_DIR$/deps/geohash/lib" />
+      <root url="file://$PROJECT_DIR$/deps/geohash/lib" />
+      <root url="file://$PROJECT_DIR$/deps/geohash/lib" />
+    </SOURCES>
+  </library>
+</component>

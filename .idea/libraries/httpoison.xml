@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="httpoison" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/httpoison/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/httpoison/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/httpoison/lib" />
+      <root url="file://$PROJECT_DIR$/deps/httpoison/lib" />
+      <root url="file://$PROJECT_DIR$/deps/httpoison/lib" />
+      <root url="file://$PROJECT_DIR$/deps/httpoison/lib" />
+      <root url="file://$PROJECT_DIR$/deps/httpoison/lib" />
+    </SOURCES>
+  </library>
+</component>

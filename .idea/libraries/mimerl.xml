@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="mimerl" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/mimerl/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/mimerl/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/mimerl/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/mimerl/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/mimerl/src" />
+      <root url="file://$PROJECT_DIR$/deps/mimerl/src" />
+      <root url="file://$PROJECT_DIR$/deps/mimerl/src" />
+      <root url="file://$PROJECT_DIR$/deps/mimerl/src" />
+    </SOURCES>
+  </library>
+</component>

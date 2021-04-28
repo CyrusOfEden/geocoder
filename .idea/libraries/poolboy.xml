@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="poolboy" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/poolboy/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/poolboy/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/poolboy/src" />
+      <root url="file://$PROJECT_DIR$/deps/poolboy/src" />
+      <root url="file://$PROJECT_DIR$/deps/poolboy/src" />
+      <root url="file://$PROJECT_DIR$/deps/poolboy/src" />
+      <root url="file://$PROJECT_DIR$/deps/poolboy/src" />
+      <root url="file://$PROJECT_DIR$/deps/poolboy/src" />
+    </SOURCES>
+  </library>
+</component>

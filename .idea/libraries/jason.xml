@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="jason" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/jason/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/jason/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/jason/lib" />
+      <root url="file://$PROJECT_DIR$/deps/jason/lib" />
+      <root url="file://$PROJECT_DIR$/deps/jason/lib" />
+      <root url="file://$PROJECT_DIR$/deps/jason/lib" />
+      <root url="file://$PROJECT_DIR$/deps/jason/lib" />
+    </SOURCES>
+  </library>
+</component>

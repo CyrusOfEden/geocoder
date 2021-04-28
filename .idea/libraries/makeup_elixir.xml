@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="makeup_elixir" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/makeup_elixir/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/makeup_elixir/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/makeup_elixir/lib" />
+      <root url="file://$PROJECT_DIR$/deps/makeup_elixir/lib" />
+      <root url="file://$PROJECT_DIR$/deps/makeup_elixir/lib" />
+      <root url="file://$PROJECT_DIR$/deps/makeup_elixir/lib" />
+      <root url="file://$PROJECT_DIR$/deps/makeup_elixir/lib" />
+    </SOURCES>
+  </library>
+</component>

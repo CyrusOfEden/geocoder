@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="nimble_parsec" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/nimble_parsec/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/nimble_parsec/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/nimble_parsec/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/nimble_parsec/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/nimble_parsec/lib" />
+      <root url="file://$PROJECT_DIR$/deps/nimble_parsec/lib" />
+      <root url="file://$PROJECT_DIR$/deps/nimble_parsec/lib" />
+      <root url="file://$PROJECT_DIR$/deps/nimble_parsec/lib" />
+    </SOURCES>
+  </library>
+</component>

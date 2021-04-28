@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="idna" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/idna/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/idna/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/idna/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/idna/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/idna/src" />
+      <root url="file://$PROJECT_DIR$/deps/idna/src" />
+      <root url="file://$PROJECT_DIR$/deps/idna/src" />
+      <root url="file://$PROJECT_DIR$/deps/idna/src" />
+    </SOURCES>
+  </library>
+</component>

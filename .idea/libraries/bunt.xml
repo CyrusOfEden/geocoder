@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="bunt" type="mix">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/bunt/lib" />
+      <root url="file://$PROJECT_DIR$/deps/bunt/lib" />
+      <root url="file://$PROJECT_DIR$/deps/bunt/lib" />
+      <root url="file://$PROJECT_DIR$/deps/bunt/lib" />
+    </SOURCES>
+  </library>
+</component>

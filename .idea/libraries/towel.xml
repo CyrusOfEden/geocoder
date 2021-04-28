@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="towel" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/towel/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/towel/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/towel/lib" />
+      <root url="file://$PROJECT_DIR$/deps/towel/lib" />
+      <root url="file://$PROJECT_DIR$/deps/towel/lib" />
+      <root url="file://$PROJECT_DIR$/deps/towel/lib" />
+      <root url="file://$PROJECT_DIR$/deps/towel/lib" />
+    </SOURCES>
+  </library>
+</component>
