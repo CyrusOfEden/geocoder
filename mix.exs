@@ -7,7 +7,7 @@ defmodule Geocoder.Mixfile do
       description: "A simple, efficient geocoder/reverse geocoder with a built-in cache.",
       source_url: "https://github.com/knrz/geocoder",
       homepage_url: "https://github.com/knrz/geocoder",
-      version: "1.1.1",
+      version: "1.1.2",
       elixir: "~> 1.9",
       otp: "~> 20",
       package: package(),
