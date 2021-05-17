@@ -1,4 +1,5 @@
-Geocoder ![Build Status](https://github.com/knrz/geocoder/actions/workflows/elixir.yml/badge.svg) [![Inline docs](http://inch-ci.org/github/knrz/geocoder.svg?branch=master)](http://inch-ci.org/github/knrz/geocoder) [![Coverage Status](https://coveralls.io/repos/github/knrz/geocoder/badge.svg?branch=master)](https://coveralls.io/github/knrz/geocoder?branch=master)
+Geocoder ![Build Status](https://github.com/knrz/geocoder/actions/workflows/elixir.yml/badge.svg) [![Inline docs](http://inch-ci.org/github/knrz/geocoder.svg?branch=master)](http://inch-ci.org/github/knrz/geocoder) [![Coverage Status](https://coveralls.io/repos/github/knrz/geocoder/badge.svg?branch=master)](https://coveralls.io/github/knrz/geocoder?branch=master) [![Hex pm](https://img.shields.io/hexpm/v/geocoder.svg?style=flat)](https://hex.pm/packages/geocoder)
+
 ========
 
 A simple, efficient geocoder/reverse geocoder with a built-in cache.
