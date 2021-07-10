@@ -1,16 +1,15 @@
 defmodule Geocoder.Mixfile do
   use Mix.Project
 
+  @source_url "https://github.com/knrz/geocoder"
+  @version "1.1.2"
+
   def project do
     [
       app: :geocoder,
-      description: "A simple, efficient geocoder/reverse geocoder with a built-in cache.",
-      source_url: "https://github.com/knrz/geocoder",
-      homepage_url: "https://github.com/knrz/geocoder",
-      version: "1.1.2",
+      version: @version,
       elixir: "~> 1.9",
       otp: "~> 20",
-      package: package(),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
@@ -20,15 +19,21 @@ defmodule Geocoder.Mixfile do
         "coveralls.post": :test,
         "coveralls.html": :test
       ],
-      deps: deps()
+      package: package(),
+      deps: deps(),
+      docs: docs()
     ]
   end
 
   def package do
     [
+      description: "A simple, efficient geocoder/reverse geocoder with a built-in cache.",
       licenses: ["MIT"],
       maintainers: ["Kash Nouroozi", "Arjan Scherpenisse", "Michael Bianco"],
-      links: %{"GitHub" => "https://github.com/knrz/geocoder"}
+      links: %{
+        "Changelog" => "https://github.com/knrz/geocoder/releases",
+        "GitHub" => @source_url
+      }
     ]
   end
 
@@ -46,9 +51,28 @@ defmodule Geocoder.Mixfile do
       {:towel, "~> 0.2"},
       {:poolboy, "~> 1.5"},
       {:geohash, "~> 1.2"},
-      {:ex_doc, "~> 0.19", only: :dev},
+      {:ex_doc, "~> 0.24.2", only: :dev, runtime: false},
       {:inch_ex, ">= 0.0.0", only: :docs},
       {:excoveralls, "~> 0.14", only: :test}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: [
+        "CODE_OF_CONDUCT.md": [title: "Code of Conduct"],
+        "LICENSE.md": [title: "License"],
+        "README.md": [title: "Overview"]
+      ],
+      groups_for_modules: [
+        Providers: ~r/^Geocoder.Providers/,
+        Structs: [Geocoder.Bounds, Geocoder.Coords, Geocoder.Location]
+      ],
+      main: "readme",
+      source_url: @source_url,
+      source_ref: "v#{@version}",
+      homepage_url: @source_url,
+      formatters: ["html"]
     ]
   end
 end
