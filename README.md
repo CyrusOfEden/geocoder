@@ -1,5 +1,14 @@
-Geocoder ![Build Status](https://github.com/knrz/geocoder/actions/workflows/elixir.yml/badge.svg) [![Inline docs](http://inch-ci.org/github/knrz/geocoder.svg?branch=master)](http://inch-ci.org/github/knrz/geocoder) [![Coverage Status](https://coveralls.io/repos/github/knrz/geocoder/badge.svg?branch=master)](https://coveralls.io/github/knrz/geocoder?branch=master) [![Hex pm](https://img.shields.io/hexpm/v/geocoder.svg?style=flat)](https://hex.pm/packages/geocoder)
+Geocoder
 ========
+
+[![Build Status](https://github.com/knrz/geocoder/actions/workflows/elixir.yml/badge.svg)](https://github.com/knrz/geocoder/actions/workflows/elixir.yml)
+[![Inline docs](http://inch-ci.org/github/knrz/geocoder.svg?branch=master)](http://inch-ci.org/github/knrz/geocoder)
+[![Coverage Status](https://coveralls.io/repos/github/knrz/geocoder/badge.svg?branch=master)](https://coveralls.io/github/knrz/geocoder?branch=master)
+[![Module Version](https://img.shields.io/hexpm/v/geocoder.svg)](https://hex.pm/packages/geocoder)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/geocoder/)
+[![Total Download](https://img.shields.io/hexpm/dt/geocoder.svg)](https://hex.pm/packages/geocoder)
+[![License](https://img.shields.io/hexpm/l/geocoder.svg)](https://github.com/knrz/geocoder/blob/master/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/knrz/geocoder.svg)](https://github.com/knrz/geocoder/commits/master)
 
 A simple, efficient geocoder/reverse geocoder with a built-in cache.
 
@@ -9,11 +18,13 @@ Is it extensible? Yes.
 Installation
 ------------
 
-Keep calm and add Geocoder to your `mix.exs` dependencies:
+Keep calm and add `:geocoder` to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
-  [{:geocoder, "~> 1.1"}]
+  [
+    {:geocoder, "~> 1.1"}
+  ]
 end
 ```
 
@@ -48,7 +59,7 @@ config :geocoder, :worker,
 Note that `OpenStreetMaps` (the default provider) is the only provider that does not require an API key to operate.
 All other providers require an API key that you'll need to provide.
 
-If you need to set a proxy (or any other option supported by HTTPoison.get/3):
+If you need to set a proxy (or any other option supported by `HTTPoison.get/3`):
 
 ```elixir
 config :geocoder, Geocoder.Worker, [
@@ -93,7 +104,7 @@ And you're done! How simple was that?
 Development
 -----------
 
-Right now, `geocoder` supports three providers (i.e. sources):
+Right now, `:geocoder` supports three providers (i.e. sources):
 
 * `Geocoder.Providers.GoogleMaps`
 * `Geocoder.Providers.OpenCageData`
@@ -116,6 +127,6 @@ Related & Alternative Packages
 
 ## Copyright and License
 
-Copyright (c) 2019, Kash Nouroozi.
+Copyright (c) 2015 Kash Nouroozi
 
-The source code is licensed under the [MIT License](LICENSE.md).
+The source code is licensed under the [MIT License](./LICENSE.md).
