@@ -107,6 +107,8 @@ defmodule Geocoder.Providers.OpenStreetMaps do
   #   "osm_id" => "45352282", "osm_type" => "way", "place_id" => "70350383"}
   @map %{
     "house_number" => :street_number,
+     # Australia suburbs are used instead of counties: https://github.com/knrz/geocoder/pull/71
+    "suburb" => :county,
     "county" => :county,
     "city" => :city,
     "road" => :street,
