@@ -107,6 +107,7 @@ defmodule Geocoder.Providers.OpenStreetMaps do
   #   "osm_id" => "45352282", "osm_type" => "way", "place_id" => "70350383"}
   @map %{
     "house_number" => :street_number,
+    "suburb" => :county,
     "county" => :county,
     "city" => :city,
     "road" => :street,
