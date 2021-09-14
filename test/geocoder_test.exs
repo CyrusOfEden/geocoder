@@ -13,6 +13,14 @@ defmodule GeocoderTest do
     :ok
   end
 
+  test "Store accepts configuration" do
+    Application.put_env(:geocoder, Geocoder.Store, precision: 3)
+    Application.stop(:geocoder)
+
+    assert :ok == Application.start(:geocoder)
+    assert {_links, _store, [precision: 3]} = Geocoder.Store.state()
+  end
+
   test "An address in New York" do
     {:ok, coords} = Geocoder.call("1991 15th Street, Troy, NY 12180")
     assert_new_york(coords)

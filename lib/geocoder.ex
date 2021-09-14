@@ -21,7 +21,7 @@ defmodule Geocoder do
         worker_config(),
         Application.get_env(:geocoder, :worker, [])
       ),
-      Supervisor.child_spec(Geocoder.Store, store_config())
+      {Geocoder.Store, store_config()}
     ]
 
     options = [
