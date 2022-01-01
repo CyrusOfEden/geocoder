@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         # https://repo.hex.pm/builds/elixir/builds.txt
-        elixir: [1.9.4, 1.10.4, 1.11.3, 1.12.2]
+        elixir: [1.9.4, 1.10.4, 1.11.4, 1.12.3, 1.13.1]
         otp: [21.x, 22.x]
         include:
           - elixir: 1.9.4
