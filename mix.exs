@@ -51,7 +51,7 @@ defmodule Geocoder.Mixfile do
       {:towel, "~> 0.2"},
       {:poolboy, "~> 1.5"},
       {:geohash, "~> 1.2"},
-      {:ex_doc, "~> 0.26.0", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.28.0", only: :dev, runtime: false},
       {:inch_ex, ">= 0.0.0", only: :docs},
       {:excoveralls, "~> 0.14", only: :test}
     ]
