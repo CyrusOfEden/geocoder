@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :geocoder, :worker_pool_config,
   size: 4,
