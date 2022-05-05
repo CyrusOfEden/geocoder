@@ -101,6 +101,18 @@ See [here](https://developers.google.com/maps/documentation/geocoding/intro#geoc
 
 And you're done! How simple was that?
 
+Extension
+---------
+
+Any additional Providers must implement all of the following functions:
+
+```
+geocode/1
+geocode_list/1
+reverse_geocode/1
+reverse_geocode_list/1
+```
+
 Development
 -----------
 
