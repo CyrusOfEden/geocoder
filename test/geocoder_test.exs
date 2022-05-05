@@ -8,7 +8,7 @@ defmodule GeocoderTest do
     {:ok, _} = Supervisor.restart_child(Geocoder.Supervisor, Geocoder.Store)
 
     # OpenStreetData is rate-limited at 1rps. Let's ensure our tests don't break that rate limit.
-    Process.sleep(1_000)
+    System.get_env("PROVIDER") != "fake" && Process.sleep(1_000)
 
     :ok
   end

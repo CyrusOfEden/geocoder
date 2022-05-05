@@ -67,7 +67,7 @@ config :geocoder, Geocoder.Worker,
       }
     }
   }
-case System.get_env("PROVIDER", "openstreetmaps") do
+case System.get_env("PROVIDER", "fake") do
   "google" ->
     config :geocoder, :worker,
       provider: Geocoder.Providers.GoogleMaps,
@@ -80,4 +80,7 @@ case System.get_env("PROVIDER", "openstreetmaps") do
 
   "openstreetmaps" ->
     config :geocoder, :worker, provider: Geocoder.Providers.OpenStreetMaps
+
+  "fake" ->
+    config :geocoder, :worker, provider: Geocoder.Providers.Fake
 end
