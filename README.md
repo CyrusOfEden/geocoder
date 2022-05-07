@@ -1,5 +1,4 @@
-Geocoder
-========
+# Geocoder
 
 [![Build Status](https://github.com/knrz/geocoder/actions/workflows/elixir.yml/badge.svg)](https://github.com/knrz/geocoder/actions/workflows/elixir.yml)
 [![Inline docs](http://inch-ci.org/github/knrz/geocoder.svg?branch=master)](http://inch-ci.org/github/knrz/geocoder)
@@ -15,8 +14,7 @@ A simple, efficient geocoder/reverse geocoder with a built-in cache.
 Is it extensible? Yes.
 **Is it any good?** Absolutely.
 
-Installation
-------------
+## Installation
 
 Keep calm and add `:geocoder` to your `mix.exs` dependencies:
 
@@ -36,8 +34,9 @@ mix deps.get
 
 If you are Elixir < 1.9, you'll need to use a version before `1.0`.
 
-Configuration
--------------
+## Configuration
+
+### Prod & Dev
 
 All configuration below is optional. Sane defaults are set so you don't need to think too hard.
 
@@ -66,11 +65,70 @@ config :geocoder, Geocoder.Worker, [
   httpoison_options: [proxy: "my.proxy.server:3128", proxy_auth: {"username", "password"}]
 ]
 ```
+### Test
+
+To avoid making external requests in the context of the test suite, usage of the [`Fake`](./lib/geocoder/providers/fake.ex) provider is recommended.
+
+The fake provider can be configured by adding a `:data` tuple to the `Geocoder.Worker` configuration as shown below.
+
+The keys of the data map must be in either [regex](https://hexdocs.pm/elixir/Regex.html) or
+[tuple](https://hexdocs.pm/elixir/Tuple.html) format (specifically a `{lat, lng}` style pair of floats).
+
+```elixir
+# config/test.exs
+config :geocoder, :worker,
+  provider: Geocoder.Providers.Fake
+
+config :geocoder, Geocoder.Worker,
+  data: %{
+    ~r/.*New York, NY.*/ => %{
+      lat: 40.7587905,
+      lon: -73.9787755,
+      bounds: %{
+        bottom: 40.7587405,
+        left: -73.9788255,
+        right: -73.9787255,
+        top: 40.7588405,
+      },
+      location: %{
+        city: "New York",
+        country: "United States",
+        country_code: "us",
+        county: "New York County", 
+        formatted_address: "30 Rockefeller Plaza, New York, NY 10112, United States of America",
+        postal_code: "10112",
+        state: "New York",
+        street: "Rockefeller Plaza",
+        street_number: "30"
+      },
+    },
+    {40.7587905, -73.9787755} => %{
+      lat: 40.7587905,
+      lon: -73.9787755,
+      bounds: %{
+        bottom: 40.7587405,
+        left: -73.9788255,
+        right: -73.9787255,
+        top: 40.7588405,
+      },
+      location: %{
+        city: "New York",
+        country: "United States",
+        country_code: "us",
+        county: "New York County", 
+        formatted_address: "30 Rockefeller Plaza, New York, NY 10112, United States of America",
+        postal_code: "10112",
+        state: "New York",
+        street: "Rockefeller Plaza",
+        street_number: "30"
+      },
+    }
+  }
+```
 
 Let's rumble!
 
-Usage
------
+## Usage
 
 ```elixir
 {:ok, coordinates } = Geocoder.call("Toronto, ON")
@@ -85,7 +143,7 @@ You can pass options to the function that will be passed to the geocoder provide
 Geocoder.call(address: "Toronto, ON", language: "es", key: "...", ...)
 ```
 
-You can also change the provider on a per-call basis:
+You can also change the provider on a per-call basis:zx
 
 ```elixir
 {:ok, coordinates } =
@@ -101,8 +159,8 @@ See [here](https://developers.google.com/maps/documentation/geocoding/intro#geoc
 
 And you're done! How simple was that?
 
-Extension
----------
+## Extension
+
 
 Any additional Providers must implement all of the following functions:
 
@@ -113,10 +171,9 @@ reverse_geocode/1
 reverse_geocode_list/1
 ```
 
-Development
------------
+## Development
 
-Right now, `:geocoder` supports three providers (i.e. sources):
+Right now, `:geocoder` supports three external providers (i.e. sources):
 
 * `Geocoder.Providers.GoogleMaps`
 * `Geocoder.Providers.OpenCageData`
@@ -128,10 +185,9 @@ To run the tests for these, and any future providers, you'll want to pass a `PRO
 PROVIDER=google mix test
 ```
 
-By default, the tests run on OpenStreetMaps.
+By default, the tests against the [`Fake`](./lib/geocoder/providers/fake.ex) provider.
 
-Related & Alternative Packages
-------------------------------
+## Related & Alternative Packages
 
 * https://github.com/amotion-city/lib_lat_lon
 * https://github.com/navinpeiris/geoip
