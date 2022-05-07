@@ -6,7 +6,7 @@ config :geocoder, :worker_pool_config,
 
 config :geocoder, Geocoder.Worker,
   data: %{
-    "1991 15th Street, Troy, NY 12180" => %{
+    ~r/.*Troy, NY.*/ => %{
       lat: 0.0,
       lon: 0.0,
       bounds: %{
@@ -24,7 +24,7 @@ config :geocoder, Geocoder.Worker,
         postal_code: "12180",
       }
     },
-    "Dikkelindestraat 46, 9032 Wondelgem, Belgium" => %{
+    ~r/.*Wondelgem, Belgium.*/ => %{
       lat: 51.0775527,
       lon: 3.7074204,
       bounds: %{
