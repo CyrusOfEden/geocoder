@@ -4,23 +4,31 @@ defmodule Geocoder.Providers.Fake do
   @error {:error, nil}
 
   def geocode(opts) do
-    geocode_from_config(opts[:address])
-    |> parse_geocode()
+    coords = geocode_from_config(opts[:address])
+      |> parse_geocode()
+
+    {:ok, coords}
   end
 
   def geocode_list(opts) do
-    opts
-    |> Enum.map(fn x -> geocode(x) end)
+    coords = geocode_from_config(opts[:address])
+      |> parse_geocode()
+
+    {:ok, List.wrap(coords)}
   end
 
   def reverse_geocode(opts) do
-    reverse_geocode_from_config(opts[:latlng])
-    |> parse_geocode()
+    coords = reverse_geocode_from_config(opts[:latlng])
+      |> parse_geocode()
+
+    {:ok, coords}
   end
 
   def reverse_geocode_list(opts) do
-    opts
-    |> Enum.map(fn x -> reverse_geocode(x) end)
+    coords = reverse_geocode_from_config(opts[:latlng])
+      |> parse_geocode()
+
+    {:ok, List.wrap(coords)}
   end
 
   defp parse_geocode(nil), do: @error
@@ -29,7 +37,7 @@ defmodule Geocoder.Providers.Fake do
     coords = geocode_coords(loaded_config)
     bounds = geocode_bounds(loaded_config[:bounds])
     location = geocode_location(loaded_config[:location])
-    {:ok, %{coords | bounds: bounds, location: location}}
+    %{coords | bounds: bounds, location: location}
   end
 
   defp geocode_coords(%{lat: lat, lon: lon}) do

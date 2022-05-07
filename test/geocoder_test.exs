@@ -1,5 +1,5 @@
 defmodule GeocoderTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   setup do
     # there's some state we need to clear before each test run
@@ -8,7 +8,7 @@ defmodule GeocoderTest do
     {:ok, _} = Supervisor.restart_child(Geocoder.Supervisor, Geocoder.Store)
 
     # OpenStreetData is rate-limited at 1rps. Let's ensure our tests don't break that rate limit.
-    System.get_env("PROVIDER") != "fake" && Process.sleep(1_000)
+    System.get_env("PROVIDER", "fake") != "fake" && Process.sleep(1_000)
 
     :ok
   end
