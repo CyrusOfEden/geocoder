@@ -143,7 +143,7 @@ You can pass options to the function that will be passed to the geocoder provide
 Geocoder.call(address: "Toronto, ON", language: "es", key: "...", ...)
 ```
 
-You can also change the provider on a per-call basis:zx
+You can also change the provider on a per-call basis:
 
 ```elixir
 {:ok, coordinates } =
