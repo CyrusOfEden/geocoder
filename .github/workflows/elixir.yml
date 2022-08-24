@@ -18,6 +18,8 @@ jobs:
         elixir: [1.11.4, 1.12.3, 1.13.2, 1.14]
         otp: [21.x, 22.x, 23.x, 24.x, 25.x]
         exclude:
+          - elixir: 1.11.4
+            otp: 25.x
           - elixir: 1.12.3
             otp: 21.x
           - elixir: 1.13.2
@@ -58,4 +60,4 @@ jobs:
       - run: mix coveralls.github
         if: ${{matrix.coverage}}
 
-      - run: MIX_ENV=docs mix do deps.get, inch.report
+      - run: MIX_ENV=docs mix do deps.get
