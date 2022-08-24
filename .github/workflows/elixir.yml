@@ -20,12 +20,12 @@ jobs:
         exclude:
           - elixir: 1.12.3
             otp: 21.x
-          - elixir: 1.13.1
+          - elixir: 1.13.2
             otp: 21.x
           - elixir: 1.14
             otp: 21.x
           - elixir: 1.14
-            otp: 21.x
+            otp: 22.x
         include:
           - elixir: 1.14
             otp: 25.x
