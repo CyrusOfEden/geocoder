@@ -22,11 +22,13 @@ jobs:
             otp: 21.x
           - elixir: 1.13.1
             otp: 21.x
+          - elixir: 1.14
+            otp: 21.x
+          - elixir: 1.14
+            otp: 21.x
         include:
-          - elixir: 1.9.4
-            otp: 20.x
-          - elixir: 1.11.3
-            otp: 23.3
+          - elixir: 1.14
+            otp: 25.x
             lint: lint
             coverage: coverage
     steps:
