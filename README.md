@@ -65,6 +65,12 @@ config :geocoder, Geocoder.Worker, [
   httpoison_options: [proxy: "my.proxy.server:3128", proxy_auth: {"username", "password"}]
 ]
 ```
+
+If you want to change the cache precision (defaults to `6`):
+
+```elixir
+config :geocoder, Geocoder.Store, precision: 6
+```
 ### Test
 
 To avoid making external requests in the context of the test suite, usage of the [`Fake`](./lib/geocoder/providers/fake.ex) provider is recommended.
