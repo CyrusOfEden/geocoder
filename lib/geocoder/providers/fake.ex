@@ -4,28 +4,32 @@ defmodule Geocoder.Providers.Fake do
   @error {:error, nil}
 
   def geocode(opts) do
-    coords = geocode_from_config(opts[:address])
+    coords =
+      geocode_from_config(opts[:address])
       |> parse_geocode()
 
     {:ok, coords}
   end
 
   def geocode_list(opts) do
-    coords = geocode_from_config(opts[:address])
+    coords =
+      geocode_from_config(opts[:address])
       |> parse_geocode()
 
     {:ok, List.wrap(coords)}
   end
 
   def reverse_geocode(opts) do
-    coords = reverse_geocode_from_config(opts[:latlng])
+    coords =
+      reverse_geocode_from_config(opts[:latlng])
       |> parse_geocode()
 
     {:ok, coords}
   end
 
   def reverse_geocode_list(opts) do
-    coords = reverse_geocode_from_config(opts[:latlng])
+    coords =
+      reverse_geocode_from_config(opts[:latlng])
       |> parse_geocode()
 
     {:ok, List.wrap(coords)}
@@ -64,7 +68,8 @@ defmodule Geocoder.Providers.Fake do
   end
 
   def geocode_from_config(key) do
-    {_, value} = get_worker_config()
+    {_, value} =
+      get_worker_config()
       |> Enum.filter(fn {k, _} -> is_struct(k, Regex) end)
       |> Enum.find(@error, fn {regex, _} -> String.match?(key, regex) end)
 
@@ -72,7 +77,8 @@ defmodule Geocoder.Providers.Fake do
   end
 
   def reverse_geocode_from_config(latlng) do
-    {_, value} = get_worker_config()
+    {_, value} =
+      get_worker_config()
       |> Enum.filter(fn {k, _} -> is_tuple(k) end)
       |> Enum.find(@error, fn {tuple, _} -> tuple == latlng end)
 

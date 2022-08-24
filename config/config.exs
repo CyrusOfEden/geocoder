@@ -13,7 +13,7 @@ config :geocoder, Geocoder.Worker,
         top: 0.0,
         right: 0.0,
         bottom: 0.0,
-        left: 0.0,
+        left: 0.0
       },
       location: %{
         street_number: "1991",
@@ -21,7 +21,7 @@ config :geocoder, Geocoder.Worker,
         city: "Troy",
         county: "Rensselaer County",
         country_code: "us",
-        postal_code: "12180",
+        postal_code: "12180"
       }
     },
     ~r/.*Wondelgem, Belgium.*/ => %{
@@ -31,7 +31,7 @@ config :geocoder, Geocoder.Worker,
         bottom: 51.077496,
         left: 3.7073144,
         right: 3.7075457,
-        top: 51.0776028,
+        top: 51.0776028
       },
       location: %{
         city: "Ghent",
@@ -52,7 +52,7 @@ config :geocoder, Geocoder.Worker,
         bottom: 51.077496,
         left: 3.7073144,
         right: 3.7075457,
-        top: 51.0776028,
+        top: 51.0776028
       },
       location: %{
         city: "Ghent",
@@ -67,6 +67,7 @@ config :geocoder, Geocoder.Worker,
       }
     }
   }
+
 case System.get_env("PROVIDER", "fake") do
   "google" ->
     config :geocoder, :worker,
