@@ -8,8 +8,8 @@ defmodule Geocoder.Mixfile do
     [
       app: :geocoder,
       version: @version,
-      elixir: "~> 1.9",
-      otp: "~> 20",
+      elixir: "~> 1.10",
+      otp: "~> 21",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
@@ -52,7 +52,6 @@ defmodule Geocoder.Mixfile do
       {:poolboy, "~> 1.5"},
       {:geohash, "~> 1.2"},
       {:ex_doc, "~> 0.28.0", only: :dev, runtime: false},
-      {:inch_ex, ">= 0.0.0", only: :docs},
       {:excoveralls, "~> 0.14", only: :test}
     ]
   end
