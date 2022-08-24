@@ -26,7 +26,7 @@ defmodule Geocoder.Store do
   # GenServer API
   def init(args), do: {:ok, args}
 
-  @defaults [precision: 4]
+  @defaults [precision: 6]
   def start_link(opts \\ []) do
     opts = Keyword.merge(@defaults, opts)
     GenServer.start_link(__MODULE__, {%{}, %{}, opts}, name: name())
