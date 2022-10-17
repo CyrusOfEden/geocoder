@@ -48,7 +48,8 @@ defmodule Geocoder.Providers.GoogleMaps do
     coords = geocode_coords(response)
     bounds = geocode_bounds(response)
     location = geocode_location(response)
-    %{coords | bounds: bounds, location: location}
+    partial_match = geocode_partial_match(response)
+    %{coords | bounds: bounds, location: location, partial_match: partial_match}
   end
 
   defp parse_reverse_geocode(response) do
@@ -133,6 +134,8 @@ defmodule Geocoder.Providers.GoogleMaps do
     |> Enum.map(map)
     |> Enum.reduce(location, reduce)
   end
+
+  defp geocode_partial_match(response), do: response["partial_match"] || false
 
   defp request_all(path, params) do
     params =
