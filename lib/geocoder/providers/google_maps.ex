@@ -48,7 +48,7 @@ defmodule Geocoder.Providers.GoogleMaps do
     coords = geocode_coords(response)
     bounds = geocode_bounds(response)
     location = geocode_location(response)
-    partial_match = geocode_partial_match(response)
+    partial_match = response["partial_match"]
     %{coords | bounds: bounds, location: location, partial_match: partial_match}
   end
 
@@ -134,8 +134,6 @@ defmodule Geocoder.Providers.GoogleMaps do
     |> Enum.map(map)
     |> Enum.reduce(location, reduce)
   end
-
-  defp geocode_partial_match(response), do: response["partial_match"] || false
 
   defp request_all(path, params) do
     params =

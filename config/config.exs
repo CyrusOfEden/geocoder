@@ -65,6 +65,28 @@ config :geocoder, Geocoder.Worker,
         street: "Dikkelindestraat",
         street_number: "46"
       }
+    },
+    ~r/.*São Paulo, Brazil.*/ => %{
+      lat: -23.473875,
+      lon: -46.6088782,
+      bounds: %{
+        bottom: nil,
+        left: nil,
+        right: nil,
+        top: nil
+      },
+      location: %{
+        city: nil,
+        country: "Brazil",
+        country_code: "BR",
+        county: "São Paulo",
+        formatted_address: "Travessa Mário Antônio Correia, 80 - Tucuruvi, São Paulo - SP, 02342-170, Brazil",
+        postal_code: "02342-170",
+        state: "São Paulo",
+        street: "Travessa Mário Antônio Correia",
+        street_number: "80"
+      },
+      partial_match: true
     }
   }
 
