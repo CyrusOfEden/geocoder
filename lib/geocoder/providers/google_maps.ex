@@ -48,7 +48,8 @@ defmodule Geocoder.Providers.GoogleMaps do
     coords = geocode_coords(response)
     bounds = geocode_bounds(response)
     location = geocode_location(response)
-    %{coords | bounds: bounds, location: location}
+    partial_match = response["partial_match"]
+    %{coords | bounds: bounds, location: location, partial_match: partial_match}
   end
 
   defp parse_reverse_geocode(response) do

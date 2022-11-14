@@ -31,6 +31,11 @@ defmodule GeocoderTest do
     assert_belgium(coords)
   end
 
+  test "An address that returns a partial match" do
+    {:ok, coords} = Geocoder.call("Rua não existente, 101, São Paulo, Brazil")
+    assert_sao_paulo(coords)
+  end
+
   test "properly handles call-specific provider and key configurations" do
     {:error, "missing API key"} =
       Geocoder.call("1991 15th Street, Troy, NY 12180", provider: Geocoder.Providers.OpenCageData)
@@ -96,5 +101,16 @@ defmodule GeocoderTest do
     assert location.formatted_address |> String.match?(~r/Belgium/)
     assert lat |> Float.round(2) == 51.08
     assert lon |> Float.round(2) == 3.71
+  end
+
+  defp assert_sao_paulo(%{location: location, partial_match: partial_match}) do
+    assert location.country == "Brazil"
+    assert location.country_code |> String.upcase() == "BR"
+    assert location.county == "São Paulo"
+    assert location.formatted_address == "Travessa Mário Antônio Correia, 80 - Tucuruvi, São Paulo - SP, 02342-170, Brazil"
+    assert location.postal_code == "02342-170"
+    assert location.street == "Travessa Mário Antônio Correia"
+    assert location.street_number == "80"
+    assert partial_match == true
   end
 end
