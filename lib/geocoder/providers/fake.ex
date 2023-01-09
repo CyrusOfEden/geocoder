@@ -41,7 +41,8 @@ defmodule Geocoder.Providers.Fake do
     coords = geocode_coords(loaded_config)
     bounds = geocode_bounds(loaded_config[:bounds])
     location = geocode_location(loaded_config[:location])
-    %{coords | bounds: bounds, location: location}
+    partial_match = loaded_config[:partial_match]
+    %{coords | bounds: bounds, location: location, partial_match: partial_match}
   end
 
   defp geocode_coords(%{lat: lat, lon: lon}) do
