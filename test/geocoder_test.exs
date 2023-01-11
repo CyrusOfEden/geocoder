@@ -107,7 +107,10 @@ defmodule GeocoderTest do
     assert location.country == "Brazil"
     assert location.country_code |> String.upcase() == "BR"
     assert location.county == "São Paulo"
-    assert location.formatted_address == "Travessa Mário Antônio Correia, 80 - Tucuruvi, São Paulo - SP, 02342-170, Brazil"
+
+    assert location.formatted_address ==
+             "Travessa Mário Antônio Correia, 80 - Tucuruvi, São Paulo - SP, 02342-170, Brazil"
+
     assert location.postal_code == "02342-170"
     assert location.street == "Travessa Mário Antônio Correia"
     assert location.street_number == "80"
