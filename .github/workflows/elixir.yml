@@ -61,5 +61,3 @@ jobs:
 
       - run: mix coveralls.github
         if: ${{matrix.coverage}}
-
-      - run: MIX_ENV=docs mix do deps.get

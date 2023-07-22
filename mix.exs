@@ -1,8 +1,8 @@
 defmodule Geocoder.Mixfile do
   use Mix.Project
 
-  @source_url "https://github.com/knrz/geocoder"
-  @version "1.1.5"
+  @source_url "https://github.com/CyrusOfEden/geocoder"
+  @version "1.1.6"
 
   def project do
     [
@@ -48,10 +48,10 @@ defmodule Geocoder.Mixfile do
     [
       {:httpoison, "~> 2.1"},
       {:jason, "~> 1.2"},
-      {:towel, "~> 0.2"},
+      {:towel, "~> 0.2.2"},
       {:poolboy, "~> 1.5"},
       {:geohash, "~> 1.2"},
-      {:ex_doc, "~> 0.29.0", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.14", only: :test}
     ]
   end
