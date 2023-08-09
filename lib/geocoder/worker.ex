@@ -19,19 +19,26 @@ defmodule Geocoder.Worker do
     store: true
   ]
 
-  def geocode(pool_name \\ nil, params) do
+  def geocode(params) do
+    {pool_name, params} = Keyword.pop(params, :pool_name)
     assign(pool_name, :geocode, params)
   end
 
-  def geocode_list(pool_name \\ nil, params) do
+  def geocode_list(params) do
+    {pool_name, params} = Keyword.pop(params, :pool_name)
+
     assign(pool_name, :geocode_list, params)
   end
 
-  def reverse_geocode(pool_name \\ nil, params) do
+  def reverse_geocode(params) do
+    {pool_name, params} = Keyword.pop(params, :pool_name)
+
     assign(pool_name, :reverse_geocode, params)
   end
 
-  def reverse_geocode_list(pool_name \\ nil, params) do
+  def reverse_geocode_list(params) do
+    {pool_name, params} = Keyword.pop(params, :pool_name)
+
     assign(pool_name, :reverse_geocode_list, params)
   end
 
