@@ -1,4 +1,6 @@
 defmodule Geocoder.Location do
+  @moduledoc false
+
   defstruct city: nil,
             state: nil,
             county: nil,

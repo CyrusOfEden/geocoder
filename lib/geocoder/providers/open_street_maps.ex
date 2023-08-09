@@ -1,39 +1,61 @@
 defmodule Geocoder.Providers.OpenStreetMaps do
-  use HTTPoison.Base
+  @moduledoc """
+  OpenStreetMaps provider logic. Does not requires a key
+
+  See documentation details at https://nominatim.org/release-docs/develop/api/Overview/
+  """
   use Towel
 
-  @endpoint "https://nominatim.openstreetmap.org/"
+  @behaviour Geocoder.Provider
+
+  @endpoint "https://nominatim.openstreetmap.org"
   @endpath_reverse "/reverse"
   @endpath_search "/search"
   @defaults [format: "json", "accept-language": "en", addressdetails: 1]
+  @map %{
+    "house_number" => :street_number,
+    # Australia suburbs are used instead of counties: https://github.com/knrz/geocoder/pull/71
+    "suburb" => :county,
+    "county" => :county,
+    "city" => :city,
+    "road" => :street,
+    "state" => :state,
+    "postcode" => :postal_code,
+    "country" => :country
+  }
 
-  def geocode(opts) do
-    request(@endpath_search, extract_opts(opts))
+  def geocode(payload_opts, opts \\ []) do
+    request(@endpath_search, extract_payload_opts(payload_opts), opts)
     |> fmap(&parse_geocode/1)
   end
 
-  def geocode_list(opts) do
-    request_all(@endpath_search, extract_opts(opts))
+  def geocode_list(payload_opts, opts \\ []) do
+    request_all(@endpath_search, extract_payload_opts(payload_opts), opts)
     |> fmap(fn
       %{} = result -> [parse_geocode(result)]
       r when is_list(r) -> Enum.map(r, &parse_geocode/1)
     end)
   end
 
-  def reverse_geocode(opts) do
-    request(@endpath_reverse, extract_opts(opts))
+  def reverse_geocode(payload_opts, opts \\ []) do
+    request(@endpath_reverse, extract_payload_opts(payload_opts), opts)
     |> fmap(&parse_reverse_geocode/1)
   end
 
-  def reverse_geocode_list(opts) do
-    request_all(@endpath_search, extract_opts(opts))
+  def reverse_geocode_list(payload_opts, opts \\ []) do
+    request_all(@endpath_search, extract_payload_opts(payload_opts), opts)
     |> fmap(fn
       %{} = result -> [parse_reverse_geocode(result)]
       r when is_list(r) -> Enum.map(r, &parse_reverse_geocode/1)
     end)
   end
 
-  defp extract_opts(opts) do
+  defp request(path, params, opts) do
+    request_all(path, params, opts)
+    |> fmap(&List.first/1)
+  end
+
+  defp extract_payload_opts(opts) do
     @defaults
     |> Keyword.merge(opts)
     |> Keyword.update!(:"accept-language", fn default -> opts[:language] || default end)
@@ -95,27 +117,6 @@ defmodule Geocoder.Providers.OpenStreetMaps do
 
   defp geocode_bounds(_), do: %Geocoder.Bounds{}
 
-  # %{"address" =>
-  #      %{"city" => "Ghent", "city_district" => "Wondelgem", "country" => "Belgium",
-  #        "country_code" => "be", "county" => "Gent", "postcode" => "9032",
-  #        "road" => "Dikkelindestraat", "state" => "Flanders"},
-  #   "boundingbox" => ["51.075731", "51.0786674", "3.7063849", "3.7083991"],
-  #   "display_name" => "Dikkelindestraat, Wondelgem, Ghent, Gent, East Flanders, Flanders, 9032, Belgium",
-  #   "lat" => "51.0772661",
-  #   "licence" => "Data © OpenStreetMap contributors, ODbL 1.0. http://www.openstreetmap.org/copyright",
-  #   "lon" => "3.7074267",
-  #   "osm_id" => "45352282", "osm_type" => "way", "place_id" => "70350383"}
-  @map %{
-    "house_number" => :street_number,
-    # Australia suburbs are used instead of counties: https://github.com/knrz/geocoder/pull/71
-    "suburb" => :county,
-    "county" => :county,
-    "city" => :city,
-    "road" => :street,
-    "state" => :state,
-    "postcode" => :postal_code,
-    "country" => :country
-  }
   defp geocode_location(
          %{
            "address" => address
@@ -134,28 +135,19 @@ defmodule Geocoder.Providers.OpenStreetMaps do
     |> Enum.reduce(location, reduce)
   end
 
-  defp request_all(path, params) do
-    httpoison_options = Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || []
+  defp request_all(path, params, opts) do
+    request = %{
+      method: :get,
+      url: @endpoint <> path,
+      query_params: Enum.into(params, %{})
+    }
 
-    case get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{}))) do
+    case Geocoder.Request.request(request, opts) do
       {:ok, %{status_code: 200, body: results}} ->
         {:ok, List.wrap(results)}
 
       {_, response} ->
         {:error, response}
     end
-  end
-
-  def request(path, params) do
-    request_all(path, params)
-    |> fmap(&List.first/1)
-  end
-
-  def process_url(url) do
-    @endpoint <> url
-  end
-
-  def process_response_body(body) do
-    body |> Jason.decode!()
   end
 end
