@@ -1,35 +1,38 @@
 defmodule Geocoder.Store do
+  @moduledoc """
+  Store is used as caching mechanism and is currently implemented as an in memory storage
+  so within an Elixir process basically
+  """
   use GenServer
   use Towel
 
-  # Public API
-  def geocode(opts) do
-    GenServer.call(name(), {:geocode, opts[:address]})
+  alias Geocoder.Config
+
+  def geocode(pid, params) do
+    GenServer.call(pid, {:geocode, params[:address]})
   end
 
-  def reverse_geocode(opts) do
-    GenServer.call(name(), {:reverse_geocode, opts[:latlng]})
+  def reverse_geocode(pid, params) do
+    GenServer.call(pid, {:reverse_geocode, params[:latlng]})
   end
 
-  def update(location) do
-    GenServer.call(name(), {:update, location})
+  def update(pid, location) do
+    GenServer.call(pid, {:update, location})
   end
 
-  def link(from, to) do
-    GenServer.cast(name(), {:link, from, to})
+  def link(pid, from, to) do
+    GenServer.cast(pid, {:link, from, to})
   end
 
-  def state do
-    GenServer.call(name(), :state)
+  def state(pid) do
+    GenServer.call(pid, :state)
   end
 
-  # GenServer API
   def init(args), do: {:ok, args}
 
-  @defaults [precision: 6]
   def start_link(opts \\ []) do
-    opts = Keyword.merge(@defaults, opts)
-    GenServer.start_link(__MODULE__, {%{}, %{}, opts}, name: name())
+    {name, opts} = Keyword.pop(opts, :name, Config.default_store_name())
+    GenServer.start_link(__MODULE__, {%{}, %{}, opts}, name: name)
   end
 
   # Fetch geocode
@@ -54,8 +57,7 @@ defmodule Geocoder.Store do
       coords.location
       |> Map.take(~w[city state country]a)
       |> Enum.filter(&is_binary(elem(&1, 1)))
-      |> Enum.map(&elem(&1, 1))
-      |> Enum.join("")
+      |> Enum.map_join("", &elem(&1, 1))
 
     key = encode({lat, lon}, opts[:precision])
     link = encode(location)
@@ -76,7 +78,6 @@ defmodule Geocoder.Store do
     {:noreply, {Map.put(links, link, key), store, opts}}
   end
 
-  # Private API
   defp encode(location, opt \\ nil)
 
   defp encode({lat, lon}, precision) do
@@ -90,8 +91,4 @@ defmodule Geocoder.Store do
     |> String.trim()
     |> :base64.encode()
   end
-
-  # Config
-  @name :geocoder_store
-  def name, do: @name
 end

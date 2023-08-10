@@ -1,35 +1,42 @@
 defmodule Geocoder.Providers.Fake do
+  @moduledoc """
+  A fake provider mostly use for testing purpose
+  """
   use Towel
 
   @error {:error, nil}
 
-  def geocode(opts) do
+  def geocode(payload_opts, opts \\ []) do
     coords =
-      geocode_from_config(opts[:address])
+      payload_opts[:address]
+      |> geocode_from_config(opts)
       |> parse_geocode()
 
     {:ok, coords}
   end
 
-  def geocode_list(opts) do
+  def geocode_list(payload_opts, opts \\ []) do
     coords =
-      geocode_from_config(opts[:address])
+      payload_opts[:address]
+      |> geocode_from_config(opts)
       |> parse_geocode()
 
     {:ok, List.wrap(coords)}
   end
 
-  def reverse_geocode(opts) do
+  def reverse_geocode(payload_opts, opts \\ []) do
     coords =
-      reverse_geocode_from_config(opts[:latlng])
+      payload_opts[:latlng]
+      |> reverse_geocode_from_config(opts)
       |> parse_geocode()
 
     {:ok, coords}
   end
 
-  def reverse_geocode_list(opts) do
+  def reverse_geocode_list(payload_opts, opts \\ []) do
     coords =
-      reverse_geocode_from_config(opts[:latlng])
+      payload_opts[:latlng]
+      |> reverse_geocode_from_config(opts)
       |> parse_geocode()
 
     {:ok, List.wrap(coords)}
@@ -63,23 +70,25 @@ defmodule Geocoder.Providers.Fake do
     Map.merge(%Geocoder.Location{}, location_attrs)
   end
 
-  def get_worker_config() do
-    Geocoder.worker_config()
+  def get_worker_config(config) do
+    config
     |> Keyword.get(:data, %{})
   end
 
-  def geocode_from_config(key) do
+  def geocode_from_config(key, config) do
     {_, value} =
-      get_worker_config()
+      config
+      |> get_worker_config()
       |> Enum.filter(fn {k, _} -> is_struct(k, Regex) end)
       |> Enum.find(@error, fn {regex, _} -> String.match?(key, regex) end)
 
     value
   end
 
-  def reverse_geocode_from_config(latlng) do
+  def reverse_geocode_from_config(latlng, config) do
     {_, value} =
-      get_worker_config()
+      config
+      |> get_worker_config()
       |> Enum.filter(fn {k, _} -> is_tuple(k) end)
       |> Enum.find(@error, fn {tuple, _} -> tuple == latlng end)
 

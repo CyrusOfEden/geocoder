@@ -1,30 +1,60 @@
 defmodule Geocoder.Providers.GoogleMaps do
-  use HTTPoison.Base
+  @moduledoc """
+  Google Map provider logic. Google requires a key
+
+  See documentation details at https://developers.google.com/maps/documentation/geocoding/
+  """
   use Towel
 
-  @endpoint "https://maps.googleapis.com/"
+  @behaviour Geocoder.Provider
 
-  def geocode(opts) do
-    request("maps/api/geocode/json", extract_opts(opts))
+  @endpoint "https://maps.googleapis.com/"
+  @components [
+    "locality",
+    "administrative_area_level_1",
+    "administrative_area_level_2",
+    "country",
+    "postal_code",
+    "street",
+    "street_number",
+    "route"
+  ]
+  @map %{
+    "street_number" => :street_number,
+    "route" => :street,
+    "street_address" => :street,
+    "locality" => :city,
+    "administrative_area_level_1" => :state,
+    "administrative_area_level_2" => :county,
+    "postal_code" => :postal_code,
+    "country" => :country
+  }
+  def geocode(payload_opts, opts \\ []) do
+    request("maps/api/geocode/json", extract_payload_opts(payload_opts), opts)
     |> fmap(&parse_geocode/1)
   end
 
-  def geocode_list(opts) do
-    request_all("maps/api/geocode/json", extract_opts(opts))
+  def geocode_list(payload_opts, opts \\ []) do
+    request_all("maps/api/geocode/json", extract_payload_opts(payload_opts), opts)
     |> fmap(fn r -> Enum.map(r, &parse_geocode/1) end)
   end
 
-  def reverse_geocode(opts) do
-    request("maps/api/geocode/json", extract_opts(opts))
+  def reverse_geocode(payload_opts, opts \\ []) do
+    request("maps/api/geocode/json", extract_payload_opts(payload_opts), opts)
     |> fmap(&parse_reverse_geocode/1)
   end
 
-  def reverse_geocode_list(opts) do
-    request_all("maps/api/geocode/json", extract_opts(opts))
+  def reverse_geocode_list(payload_opts, opts \\ []) do
+    request_all("maps/api/geocode/json", extract_payload_opts(payload_opts), opts)
     |> fmap(fn r -> Enum.map(r, &parse_reverse_geocode/1) end)
   end
 
-  defp extract_opts(opts) do
+  defp request(path, params, opts) do
+    request_all(path, params, opts)
+    |> fmap(&List.first/1)
+  end
+
+  defp extract_payload_opts(opts) do
     opts
     |> Keyword.take([
       :key,
@@ -74,26 +104,6 @@ defmodule Geocoder.Providers.GoogleMaps do
 
   defp geocode_bounds(_), do: %Geocoder.Bounds{}
 
-  @components [
-    "locality",
-    "administrative_area_level_1",
-    "administrative_area_level_2",
-    "country",
-    "postal_code",
-    "street",
-    "street_number",
-    "route"
-  ]
-  @map %{
-    "street_number" => :street_number,
-    "route" => :street,
-    "street_address" => :street,
-    "locality" => :city,
-    "administrative_area_level_1" => :state,
-    "administrative_area_level_2" => :county,
-    "postal_code" => :postal_code,
-    "country" => :country
-  }
   defp geocode_location(%{
          "address_components" => components,
          "formatted_address" => formatted_address
@@ -135,14 +145,16 @@ defmodule Geocoder.Providers.GoogleMaps do
     |> Enum.reduce(location, reduce)
   end
 
-  defp request_all(path, params) do
-    params =
-      Keyword.merge(params, key: params[:key] || Application.get_env(:geocoder, :worker)[:key])
+  defp request_all(path, params, opts) do
+    params = Keyword.merge(params, key: opts[:key])
 
-    httpoison_options = Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || []
+    request = %{
+      method: :get,
+      url: @endpoint <> path,
+      query_params: Enum.into(params, %{})
+    }
 
-    case get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{}))) do
-      # API does not return a non-200 code when there is an error!
+    case Geocoder.Request.request(request, opts) do
       {:ok,
        %{
          status_code: 200,
@@ -156,18 +168,5 @@ defmodule Geocoder.Providers.GoogleMaps do
       {_, response} ->
         {:error, response}
     end
-  end
-
-  def request(path, params) do
-    request_all(path, params)
-    |> fmap(&List.first/1)
-  end
-
-  def process_url(url) do
-    @endpoint <> url
-  end
-
-  def process_response_body(body) do
-    body |> Jason.decode!()
   end
 end

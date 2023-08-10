@@ -1,31 +1,51 @@
 defmodule Geocoder.Providers.OpenCageData do
-  use HTTPoison.Base
+  @moduledoc """
+  Open Cage Data provider logic. Open Cage Data requires a key
+
+  See documentation details at https://opencagedata.com/api
+  """
   use Towel
+
+  @behaviour Geocoder.Provider
 
   @endpoint "http://api.opencagedata.com/"
   @path "geocode/v1/json"
-
-  def geocode(opts) do
-    request(@path, opts |> extract_opts())
+  @map %{
+    "house_number" => :street_number,
+    "road" => :street,
+    "city" => :city,
+    "state" => :state,
+    "county" => :county,
+    "postcode" => :postal_code,
+    "country" => :country,
+    "country_code" => :country_code
+  }
+  def geocode(payload_opts, opts \\ []) do
+    request(@path, extract_payload_opts(payload_opts), opts)
     |> fmap(&parse_geocode/1)
   end
 
-  def geocode_list(opts) do
-    request_all(@path, opts |> extract_opts())
+  def geocode_list(payload_opts, opts \\ []) do
+    request_all(@path, extract_payload_opts(payload_opts), opts)
     |> fmap(fn r -> Enum.map(r, &parse_geocode/1) end)
   end
 
-  def reverse_geocode(opts) do
-    request(@path, opts |> extract_opts())
+  def reverse_geocode(payload_opts, opts \\ []) do
+    request(@path, extract_payload_opts(payload_opts), opts)
     |> fmap(&parse_reverse_geocode/1)
   end
 
-  def reverse_geocode_list(opts) do
-    request_all(@path, opts |> extract_opts())
+  def reverse_geocode_list(payload_opts, opts \\ []) do
+    request_all(@path, extract_payload_opts(payload_opts), opts)
     |> fmap(fn r -> Enum.map(r, &parse_reverse_geocode/1) end)
   end
 
-  defp extract_opts(opts) do
+  defp request(path, params, opts) do
+    request_all(path, params, opts)
+    |> fmap(&List.first/1)
+  end
+
+  defp extract_payload_opts(opts) do
     opts
     |> Keyword.merge(opts)
     |> Keyword.put(
@@ -81,16 +101,6 @@ defmodule Geocoder.Providers.OpenCageData do
 
   defp geocode_bounds(_), do: %Geocoder.Bounds{}
 
-  @map %{
-    "house_number" => :street_number,
-    "road" => :street,
-    "city" => :city,
-    "state" => :state,
-    "county" => :county,
-    "postcode" => :postal_code,
-    "country" => :country,
-    "country_code" => :country_code
-  }
   defp geocode_location(%{"components" => components, "formatted" => formatted_address}) do
     reduce = fn {type, name}, location ->
       struct(location, [{@map[type], name}])
@@ -103,15 +113,16 @@ defmodule Geocoder.Providers.OpenCageData do
     |> Map.drop([nil])
   end
 
-  defp request_all(path, params) do
-    httpoison_options = Application.get_env(:geocoder, Geocoder.Worker)[:httpoison_options] || []
+  defp request_all(path, params, opts) do
+    params = Keyword.merge(params, key: opts[:key])
 
-    params =
-      Keyword.merge(params, key: params[:key] || Application.get_env(:geocoder, :worker)[:key])
+    request = %{
+      method: :get,
+      url: @endpoint <> path,
+      query_params: Enum.into(params, %{})
+    }
 
-    result = get(path, [], Keyword.merge(httpoison_options, params: Enum.into(params, %{})))
-
-    case result do
+    case Geocoder.Request.request(request, opts) do
       {:ok, %{status_code: 401, body: %{"status" => %{"message" => message}}}} ->
         {:error, message}
 
@@ -121,18 +132,5 @@ defmodule Geocoder.Providers.OpenCageData do
       {_, response} ->
         {:error, response}
     end
-  end
-
-  def request(path, params) do
-    request_all(path, params)
-    |> fmap(&List.first/1)
-  end
-
-  def process_url(url) do
-    @endpoint <> url
-  end
-
-  def process_response_body(body) do
-    body |> Jason.decode!()
   end
 end

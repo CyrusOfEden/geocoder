@@ -9,19 +9,32 @@
 [![License](https://img.shields.io/hexpm/l/geocoder.svg)](https://github.com/knrz/geocoder/blob/master/LICENSE)
 [![Last Updated](https://img.shields.io/github/last-commit/knrz/geocoder.svg)](https://github.com/knrz/geocoder/commits/master)
 
-A simple, efficient geocoder/reverse geocoder with a built-in cache.
+A simple, efficient geocoder/reverse geocoder with a built-in cache. This libary is quite felxible and extensible. You can pretty much extend any part of geocoder: caching store, workers, http client, JSON Codec, Provider, etc..
 
-Is it extensible? Yes.
-**Is it any good?** Absolutely.
+It supports the current providers out of box
+- Google map
+- OpenCageData
+- Openstreet maps
+
+It supports the current http clients out of the box
+- :httpoison
+- :hackney
+
+It supports the current http clients out of the box
+- :jason
+- :jsx
+
+It supports the current caching store out of the box
+- In memory store (`Geocoder.Store`)
 
 ## Installation
 
-Keep calm and add `:geocoder` to your `mix.exs` dependencies:
+add `:geocoder` to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
   [
-    {:geocoder, "~> 1.1"}
+    {:geocoder, "~> 2.0"}
   ]
 end
 ```
@@ -32,107 +45,88 @@ Update your mix dependencies:
 mix deps.get
 ```
 
-If you are Elixir < 1.9, you'll need to use a version before `1.0`.
+**Notes:** If you are Elixir < 1.9, you'll need to use a version before `1.0`.
 
 ## Configuration
 
-### Prod & Dev
-
-All configuration below is optional. Sane defaults are set so you don't need to think too hard.
-
-Set pool configuration:
+Configuration is done by passing options to the `Geocoder.Supervisor`. See the `Geocoder.Config` for all possible configuration options. But you can just get started
+by adding this to your application tree
 
 ```elixir
-config :geocoder, :worker_pool_config, size: 4, max_overflow: 2
+[
+  Geocoder.Supervisor,
+]
 ```
 
-Set provider configuration:
+This will start the geocoder processes with all the default options, and should be compatible with 1.x (process + API + functionality)
+
+### Using a different Provider
+
+The default client for Geocoder is OpenStreeMaps. You can easily switch to other providers  option. Or you can build your own as long as you implement the behavior `Geocoder.Provider` correctly. You can look at some examples inside the `lib/geocoder/providers/*`
+
+Then you can configure the different or custom provider with the following configuration:
 
 ```elixir
-config :geocoder, :worker,
-  # OpenStreetMaps or OpenCageData are other supported providers
-  provider: Geocoder.Providers.GoogleMaps,
-  key: System.get_env("GEOCODER_GOOGLE_API_KEY")
+[
+  {Geocoder.Supervisor, worker_config: [provider: MyApp.Client,  key: "some_api_key"]},
+]
 ```
+**NOTES**: OpenStreetMaps does not require key. Others provider do.
 
-Note that `OpenStreetMaps` (the default provider) is the only provider that does not require an API key to operate.
-All other providers require an API key that you'll need to provide.
+### Using a different HTTP Client
+
+The default client for Geocoder is HTTPoison. You can easily switch to Hackney as it comes as an option. Or you can build your own as long as you implement the behavior `Geocoder.HttpClient` correctly in your client
+
+
+Then you can configure the different or custom client with the following configuration:
+
+```elixir
+[
+  {Geocoder.Supervisor, worker_config: [http_client: MyApp.Client,  http_client_opts: []]}
+]
+```
 
 If you need to set a proxy (or any other option supported by `HTTPoison.get/3`):
 
 ```elixir
-config :geocoder, Geocoder.Worker, [
-  httpoison_options: [proxy: "my.proxy.server:3128", proxy_auth: {"username", "password"}]
+[
+  {Geocoder.Supervisor, worker_config:
+    [
+      http_client_opts: [proxy: "my.proxy.server:3128", proxy_auth: {"username", "password"}]
+    ]
+   }
+  ...
 ]
 ```
 
-If you want to change the cache precision (defaults to `6`):
+### Using a different Store
+
+The default caching store is `Geocoder.Store`. This is a simple in memory cache (in a process basically) and is started by default.
+
+If you want to change the Store, you can provide your own store implementation as well. See how the `Geocoder.Store` is implemented for an example. Then you will need to configure it using:
 
 ```elixir
-config :geocoder, Geocoder.Store, precision: 6
+[
+  {Geocoder.Supervisor, store_module: MyApp.MyStore},
+  ...
+]
 ```
-### Test
+### JSON Codec Configuration
 
-To avoid making external requests in the context of the test suite, usage of the [`Fake`](./lib/geocoder/providers/fake.ex) provider is recommended.
+The default JSON codec is Jason. You can create you custom codec or use different one as long as you implement the behavior `Geocoder.JSONCodec`.
 
-The fake provider can be configured by adding a `:data` tuple to the `Geocoder.Worker` configuration as shown below.
-
-The keys of the data map must be in either [regex](https://hexdocs.pm/elixir/Regex.html) or
-[tuple](https://hexdocs.pm/elixir/Tuple.html) format (specifically a `{lat, lng}` style pair of floats).
+Then you can configure the different or custom JSON codec with the following configuration:
 
 ```elixir
-# config/test.exs
-config :geocoder, :worker,
-  provider: Geocoder.Providers.Fake
-
-config :geocoder, Geocoder.Worker,
-  data: %{
-    ~r/.*New York, NY.*/ => %{
-      lat: 40.7587905,
-      lon: -73.9787755,
-      bounds: %{
-        bottom: 40.7587405,
-        left: -73.9788255,
-        right: -73.9787255,
-        top: 40.7588405,
-      },
-      location: %{
-        city: "New York",
-        country: "United States",
-        country_code: "us",
-        county: "New York County", 
-        formatted_address: "30 Rockefeller Plaza, New York, NY 10112, United States of America",
-        postal_code: "10112",
-        state: "New York",
-        street: "Rockefeller Plaza",
-        street_number: "30"
-      },
-    },
-    {40.7587905, -73.9787755} => %{
-      lat: 40.7587905,
-      lon: -73.9787755,
-      bounds: %{
-        bottom: 40.7587405,
-        left: -73.9788255,
-        right: -73.9787255,
-        top: 40.7588405,
-      },
-      location: %{
-        city: "New York",
-        country: "United States",
-        country_code: "us",
-        county: "New York County", 
-        formatted_address: "30 Rockefeller Plaza, New York, NY 10112, United States of America",
-        postal_code: "10112",
-        state: "New York",
-        street: "Rockefeller Plaza",
-        street_number: "30"
-      },
-    }
-  }
+[
+  {Geocoder.Supervisor, worker_config:
+    [
+      json_codec: Jason
+    ]
+   }
+  ...
+]
 ```
-
-Let's rumble!
 
 ## Usage
 
@@ -165,18 +159,6 @@ See [here](https://developers.google.com/maps/documentation/geocoding/intro#geoc
 
 And you're done! How simple was that?
 
-## Extension
-
-
-Any additional Providers must implement all of the following functions:
-
-```
-geocode/1
-geocode_list/1
-reverse_geocode/1
-reverse_geocode_list/1
-```
-
 ## Development
 
 Right now, `:geocoder` supports three external providers (i.e. sources):
@@ -185,13 +167,76 @@ Right now, `:geocoder` supports three external providers (i.e. sources):
 * `Geocoder.Providers.OpenCageData`
 * `Geocoder.Providers.OpenStreetMaps`
 
-To run the tests for these, and any future providers, you'll want to pass a `PROVIDER` environment variable:
+To run the tests for these, and any future providers, you'll want to pass a `PROVIDER` environment variable as well as the `API_KEY`:
 
 ```
-PROVIDER=google mix test
+PROVIDER=google API_KEY="mykey" mix test
 ```
 
 By default, the tests against the [`Fake`](./lib/geocoder/providers/fake.ex) provider.
+
+To avoid making external requests in the context of the test suite, usage of the [`Fake`](./lib/geocoder/providers/fake.ex) provider is recommended.
+
+The fake provider can be configured by adding a `:data` tuple to the configuration as shown below.
+
+The keys of the data map must be in either [regex](https://hexdocs.pm/elixir/Regex.html) or
+[tuple](https://hexdocs.pm/elixir/Tuple.html) format (specifically a `{lat, lng}` style pair of floats).
+
+```elixir
+
+```elixir
+[
+  {Geocoder.Supervisor, worker_config:
+    [
+      data: %{
+        ~r/.*New York, NY.*/ => %{
+          lat: 40.7587905,
+          lon: -73.9787755,
+          bounds: %{
+            bottom: 40.7587405,
+            left: -73.9788255,
+            right: -73.9787255,
+            top: 40.7588405,
+          },
+          location: %{
+            city: "New York",
+            country: "United States",
+            country_code: "us",
+            county: "New York County",
+            formatted_address: "30 Rockefeller Plaza, New York, NY 10112, United States of America",
+            postal_code: "10112",
+            state: "New York",
+            street: "Rockefeller Plaza",
+            street_number: "30"
+          },
+        },
+        {40.7587905, -73.9787755} => %{
+          lat: 40.7587905,
+          lon: -73.9787755,
+          bounds: %{
+            bottom: 40.7587405,
+            left: -73.9788255,
+            right: -73.9787255,
+            top: 40.7588405,
+          },
+          location: %{
+            city: "New York",
+            country: "United States",
+            country_code: "us",
+            county: "New York County",
+            formatted_address: "30 Rockefeller Plaza, New York, NY 10112, United States of America",
+            postal_code: "10112",
+            state: "New York",
+            street: "Rockefeller Plaza",
+            street_number: "30"
+          },
+        }
+      }
+    ]
+   }
+  ...
+]
+```
 
 ## Related & Alternative Packages
 

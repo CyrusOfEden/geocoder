@@ -1,31 +1,49 @@
 defmodule Geocoder.Worker do
-  use GenServer
-  use Towel
+  @moduledoc """
+  Worker the actual process performing the geocoding request to a provider. They are use
+  within a pool (using Poolboy. See Supervisor for details)
 
-  # Public API
+  Some options are can be passed as part of params such as
+
+    * `:timeout` - The request timeout in milliseconds. Default to 5000 milliseconds
+    * `:stream_to` - When specified, an async request will be made and result sent to the value specified.
+       It also implies the  HTTP client supports streaming.
+    * `:store` - Wether to use the cache store or not. Default to true. So always checking the cache first
+
+  """
+  use GenServer
+
+  @default_options [
+    timeout: 5000,
+    stream_to: nil,
+    store: true
+  ]
+
   def geocode(params) do
-    assign(:geocode, params)
+    {pool_name, params} = Keyword.pop(params, :pool_name)
+    assign(pool_name, :geocode, params)
   end
 
   def geocode_list(params) do
-    assign(:geocode_list, params)
+    {pool_name, params} = Keyword.pop(params, :pool_name)
+
+    assign(pool_name, :geocode_list, params)
   end
 
   def reverse_geocode(params) do
-    assign(:reverse_geocode, params)
+    {pool_name, params} = Keyword.pop(params, :pool_name)
+
+    assign(pool_name, :reverse_geocode, params)
   end
 
   def reverse_geocode_list(params) do
-    assign(:reverse_geocode_list, params)
+    {pool_name, params} = Keyword.pop(params, :pool_name)
+
+    assign(pool_name, :reverse_geocode_list, params)
   end
 
-  # GenServer API
-  @worker_defaults [
-    store: Geocoder.Store,
-    provider: Geocoder.Providers.OpenStreetMaps
-  ]
   def init(conf) do
-    {:ok, Keyword.merge(@worker_defaults, conf)}
+    {:ok, conf}
   end
 
   def start_link(conf) do
@@ -33,12 +51,14 @@ defmodule Geocoder.Worker do
   end
 
   def handle_call({function, params}, _from, conf) do
-    # unfortunately, both the worker and param defaults use `store`
-    # for the worker, this defines which store to use, for the params
-    # this defines if the store should be used
+    # use to decide wether to check the Store cache or not
     use_store = params[:store]
 
-    params = Keyword.merge(conf, Keyword.drop(params, [:store]))
+    params =
+      conf
+      |> Keyword.take([:store_config, :store_module, :worker_config])
+      |> Keyword.merge(params)
+
     {:reply, run(function, params, use_store), conf}
   end
 
@@ -50,15 +70,8 @@ defmodule Geocoder.Worker do
     {:noreply, conf}
   end
 
-  # Private API
-  @assign_defaults [
-    timeout: 5000,
-    stream_to: nil,
-    store: true
-  ]
-
-  defp assign(name, params) do
-    gen_server_options = Keyword.merge(@assign_defaults, params)
+  defp assign(pool_name, name, params) do
+    gen_server_options = Keyword.merge(@default_options, params)
     params_with_defaults = Keyword.drop(gen_server_options, [:timeout, :stream_to])
 
     function =
@@ -67,28 +80,52 @@ defmodule Geocoder.Worker do
         {_, message} -> &GenServer.cast(&1, message)
       end
 
-    :poolboy.transaction(Geocoder.pool_name(), function, gen_server_options[:timeout])
+    :poolboy.transaction(
+      pool_name || Geocoder.Config.default_pool_name(),
+      function,
+      gen_server_options[:timeout]
+    )
   end
 
-  def run(function, params, useStore)
+  defp run(function, params, useStore)
 
-  def run(function, params, _) when function in [:geocode_list, :reverse_geocode_list] do
-    apply(params[:provider], function, [params])
+  defp run(function, params, _) when function in [:geocode_list, :reverse_geocode_list] do
+    {provider, provider_config, _store_module, _store_name} = get_run_details(params)
+
+    apply(provider, function, [params, provider_config])
   end
 
-  def run(function, params, false) do
-    apply(params[:provider], function, [params])
-    |> Monad.tap(&params[:store].update/1)
-    |> Monad.tap(&params[:store].link(params, &1))
+  defp run(function, params, false) do
+    {provider, provider_config, store_module, store_name} = get_run_details(params)
+
+    with {:ok, coords} <- apply(provider, function, [params, provider_config]) do
+      update_details = store_module.update(store_name, coords)
+      store_module.link(store_name, params, update_details)
+      {:ok, coords}
+    end
   end
 
-  def run(function, params, true) do
-    case apply(params[:store], function, [params]) do
+  defp run(function, params, true) do
+    {_provider, _provider_config, store_module, store_name} = get_run_details(params)
+
+    case apply(store_module, function, [store_name, params]) do
       {:just, coords} ->
-        ok(coords)
+        {:ok, coords}
 
       :nothing ->
         run(function, params, false)
     end
+  end
+
+  defp get_run_details(params) do
+    worker_config = params[:worker_config]
+    provider = worker_config[:provider]
+    store_module = params[:store_module]
+    store_name = params[:store_config][:name]
+
+    provider_config =
+      Keyword.take(worker_config, [:http_client, :http_client_opts, :json_codec, :key, :data])
+
+    {provider, provider_config, store_module, store_name}
   end
 end

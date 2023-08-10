@@ -2,7 +2,7 @@ defmodule Geocoder.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/CyrusOfEden/geocoder"
-  @version "1.1.6"
+  @version "2.0.0"
 
   def project do
     [
@@ -10,6 +10,7 @@ defmodule Geocoder.Mixfile do
       version: @version,
       elixir: "~> 1.10",
       otp: "~> 21",
+      elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
@@ -37,31 +38,32 @@ defmodule Geocoder.Mixfile do
     ]
   end
 
-  def application do
-    [
-      extra_applications: [:logger],
-      mod: {Geocoder, []}
-    ]
-  end
-
   defp deps do
     [
-      {:httpoison, "~> 2.1"},
-      {:jason, "~> 1.2"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:httpoison, "~> 2.1", optional: true},
+      {:jason, "~> 1.2", optional: true},
+      {:jsx, "~> 2.8 or ~> 3.0", optional: true},
       {:towel, "~> 0.2.2"},
       {:poolboy, "~> 1.5"},
       {:geohash, "~> 1.2"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:hammox, "~> 0.7", only: :test},
       {:excoveralls, "~> 0.14", only: :test}
     ]
   end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp docs do
     [
       extras: [
         "CODE_OF_CONDUCT.md": [title: "Code of Conduct"],
         "LICENSE.md": [title: "License"],
-        "README.md": [title: "Overview"]
+        "README.md": [title: "Overview"],
+        "CHANGELOG.md": [title: "Changelog"]
       ],
       groups_for_modules: [
         Providers: ~r/^Geocoder.Providers/,

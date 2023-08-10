@@ -1,4 +1,6 @@
 defmodule Geocoder.Coords do
+  @moduledoc false
+
   defstruct lat: nil,
             lon: nil,
             bounds: %Geocoder.Bounds{},
