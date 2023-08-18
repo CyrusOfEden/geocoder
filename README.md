@@ -246,6 +246,6 @@ The keys of the data map must be in either [regex](https://hexdocs.pm/elixir/Reg
 
 ## Copyright and License
 
-Copyright (c) 2015 Kash Nouroozi
+Copyright (c) 2023 Cyrus Nouroozi
 
 The source code is licensed under the [MIT License](./LICENSE.md).
