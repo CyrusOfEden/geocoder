@@ -28,10 +28,17 @@ defmodule Geocoder.StoreTest do
     test "Store the location in state", %{pid: pid} do
       coord = belgium_coords()
 
+      erlang_version = :erlang.system_info(:otp_release) |> List.to_string()
+
+      # the key is different depending on the elixir version
+      key =
+        if Version.compare(erlang_version, "26.0") in [:eq, :gt],
+          do: "ZmxhbmRlcnNnaGVudGJlbGdpdW0=",
+          else: "Z2hlbnRiZWxnaXVtZmxhbmRlcnM="
+
       assert ^coord = Store.update(pid, coord)
 
-      assert {%{"Z2hlbnRiZWxnaXVtZmxhbmRlcnM=" => "u14ds6"}, %{"u14ds6" => ^coord},
-              [precision: 6]} = Store.state(pid)
+      assert {%{^key => "u14ds6"}, %{"u14ds6" => ^coord}, [precision: 6]} = Store.state(pid)
     end
   end
 
