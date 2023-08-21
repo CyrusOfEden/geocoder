@@ -6,8 +6,7 @@ on: push
 
 jobs:
   test:
-    # using `ubuntu-latest` does not support older OTP versions
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       MIX_ENV: test
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -15,25 +14,19 @@ jobs:
       fail-fast: false
       matrix:
         # https://repo.hex.pm/builds/elixir/builds.txt
-        elixir: [1.11.4, 1.12.3, 1.13.2, 1.14, 1.15]
-        otp: [21.x, 22.x, 23.x, 24.x, 25.x, 26.x]
+        elixir: [1.11, 1.12, 1.13, 1.14, 1.15]
+        otp: [24.x, 25.x, 26.x]
         exclude:
-          - elixir: 1.11.4
+          - elixir: 1.11
             otp: 25.x
-          - elixir: 1.12.3
-            otp: 21.x
-          - elixir: 1.12.3
+          - elixir: 1.11
+            otp: 26.x
+          - elixir: 1.12
             otp: 25.x
-          - elixir: 1.13.2
-            otp: 21.x
-          - elixir: 1.14
-            otp: 21.x
-          - elixir: 1.14
-            otp: 22.x
-          - elixir: 1.15
-            otp: 21.x
-          - elixir: 1.15
-            otp: 22.x
+          - elixir: 1.12
+            otp: 26.x
+          - elixir: 1.13
+            otp: 26.x
         include:
           - elixir: 1.14
             otp: 25.x
