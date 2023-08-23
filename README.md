@@ -151,7 +151,7 @@ You can also change the provider on a per-call basis:
     # use the default provider
     {:error, nil} <- Geocoder.call(query),
     # use an alternative provider. If `key` is not specified here the globally defined key will be used.
-    {:error, nil} <- Geocoder.call(query, provider: Geocoder.Providers.OpenCageData, key: "123"),
+    {:error, nil} <- Geocoder.call(query, worker_config: [provider: Geocoder.Providers.OpenCageData, key: "123"]),
     do: {:error}
 ```
 
@@ -169,7 +169,7 @@ Right now, `:geocoder` supports three external providers (i.e. sources):
 
 To run the tests for these, and any future providers, you'll want to pass a `PROVIDER` environment variable as well as the `API_KEY`:
 
-```
+```shell
 PROVIDER=google API_KEY="mykey" mix test
 ```
 
@@ -181,8 +181,6 @@ The fake provider can be configured by adding a `:data` tuple to the configurati
 
 The keys of the data map must be in either [regex](https://hexdocs.pm/elixir/Regex.html) or
 [tuple](https://hexdocs.pm/elixir/Tuple.html) format (specifically a `{lat, lng}` style pair of floats).
-
-```elixir
 
 ```elixir
 [

@@ -95,6 +95,7 @@ defmodule Geocoder.Worker do
     apply(provider, function, [params, provider_config])
   end
 
+  # when the provider is called directly and cache is not attempted
   defp run(function, params, false) do
     {provider, provider_config, store_module, store_name} = get_run_details(params)
 
@@ -118,8 +119,10 @@ defmodule Geocoder.Worker do
   end
 
   defp get_run_details(params) do
-    worker_config = params[:worker_config]
+    # we want to keep any worker_config params that were not overwritten
+    worker_config = Geocoder.Config.worker_config(params)
     provider = worker_config[:provider]
+
     store_module = params[:store_module]
     store_name = params[:store_config][:name]
 
