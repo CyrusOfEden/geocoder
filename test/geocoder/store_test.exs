@@ -28,7 +28,7 @@ defmodule Geocoder.StoreTest do
     test "Store the location in state", %{pid: pid} do
       coord = belgium_coords()
 
-      erlang_version = :erlang.system_info(:otp_release) |> List.to_string()
+      erlang_version = "#{System.otp_release()}.0.0"
 
       # the key is different depending on the elixir version
       key =
