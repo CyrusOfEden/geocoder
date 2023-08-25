@@ -32,7 +32,7 @@ defmodule Geocoder.StoreTest do
 
       # the key is different depending on the elixir version
       key =
-        if Version.compare(erlang_version, "26.0") in [:eq, :gt],
+        if Version.compare(erlang_version, "26.0.0") in [:eq, :gt],
           do: "ZmxhbmRlcnNnaGVudGJlbGdpdW0=",
           else: "Z2hlbnRiZWxnaXVtZmxhbmRlcnM="
 
