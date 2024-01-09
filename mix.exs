@@ -8,8 +8,8 @@ defmodule Geocoder.Mixfile do
     [
       app: :geocoder,
       version: @version,
-      elixir: "~> 1.10",
-      otp: "~> 21",
+      elixir: "~> 1.13",
+      otp: "~> 24",
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
