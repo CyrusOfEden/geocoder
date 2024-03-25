@@ -20,7 +20,7 @@ It supports the current http clients out of the box
 - :httpoison
 - :hackney
 
-It supports the current http clients out of the box
+It supports the current JSON clients out of the box
 - :jason
 - :jsx
 
